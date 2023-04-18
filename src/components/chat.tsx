@@ -91,16 +91,17 @@ const Chat = () => {
     return (
         <div className='flex justify-center'>
             <button
-                onClick={handleSignout}
-                type='reset'
-                className='fixed top-5 right-5 p-4 rounded-md bg-white text-gray-500 dark:hover:text-gray-400 dark:hover:bg-gray-900 disabled:hover:bg-transparent dark:disabled:hover:bg-transparent'
-            >Sign Out
+              onClick={handleSignout}
+              className='w-42 fixed top-5 left-5 outline-none border-none p-4 rounded-md bg-white text-gray-500 dark:hover:text-gray-400 dark:hover:bg-gray-900'
+            >
+              Sign Out 
             </button>
             <button
-                onClick={handleReset}
-                type='reset'
-                className='fixed top-5 left-5 p-4 rounded-md bg-white text-gray-500 dark:hover:text-gray-400 dark:hover:bg-gray-900 disabled:hover:bg-transparent dark:disabled:hover:bg-transparent'
-            >Clear History
+              onClick={handleReset}
+              type='reset'
+              className='fixed top-5 right-5 p-4 rounded-md bg-white text-gray-500 dark:hover:text-gray-400 dark:hover:bg-gray-900 disabled:hover:bg-transparent dark:disabled:hover:bg-transparent'
+            >
+              Clear History
             </button>
             <div className='w-full mx-2 flex flex-col items-start gap-3 pt-6 last:mb-6 md:mx-auto md:max-w-3xl text-white'>
             {isLoading
