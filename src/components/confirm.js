@@ -10,11 +10,7 @@ export default function Confirm({ setStatus, user }) {
   async function confirmSignUp({ code }) {
     try {
       await Auth.confirmSignUp(user.username, code);
-
       await Auth.signIn(user.username, user.password);
-
-      setUser(null)
-
       router.reload()
     } catch (error) {
       console.log('error confirming sign up', error);
