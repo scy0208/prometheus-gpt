@@ -1,11 +1,12 @@
 'use client'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { Auth } from 'aws-amplify';
 import Router from 'next/router';
+import { ChatGPTMessage } from '@/utils/OpenAIStream'
 
 const Chat = () => {
     const messageInput = useRef<HTMLTextAreaElement | null>(null)
-    const [response, setResponse] = useState<string[]>([])
+    const [dialogues, setDialogues] = useState<Array<{ role: string; content: string }>>([])
     const [isLoading, setIsLoading] = useState<boolean>(false)
 
     const handleEnter = (
@@ -22,32 +23,33 @@ const Chat = () => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         const message = messageInput.current?.value
-        if (message !== undefined) {
-          setResponse((prev) => [...prev, message])
-          messageInput.current!.value = ''
-        }
-    
-        if (!message) {
+        let currentDialogues = JSON.parse(JSON.stringify(dialogues))
+
+        if (!message || message === undefined) {
           return
         }
+
+        setDialogues((prev) => [...prev, { role: "user", content: message }])
+        currentDialogues.push({ role: "user", content: message })
+        messageInput.current!.value = ''
     
-        const response = await fetch('/api/gpt-stream-api', {
+        const httpResponse = await fetch('/api/gpt-stream-api', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            message,
+            dialogues: currentDialogues
           }),
         })
     
-        console.log(response)
+        console.log(httpResponse)
     
-        if (!response.ok) {
-          throw new Error(response.statusText)
+        if (!httpResponse.ok) {
+          throw new Error(httpResponse.statusText)
         }
     
-        const data = response.body
+        const data = httpResponse.body
         if (!data) {
           return
         }
@@ -56,25 +58,24 @@ const Chat = () => {
         const decoder = new TextDecoder()
         let done = false
     
-        setResponse((prev) => [...prev, message])
-    
+        setDialogues((prev) => [...prev, { role: "user", content: message }])    
         let currentResponse: string[] = []
         while (!done) {
           const { value, done: doneReading } = await reader.read()
           done = doneReading
           const chunkValue = decoder.decode(value)
-          // currentResponse = [...currentResponse, message, chunkValue];
           currentResponse = [...currentResponse, chunkValue]
-          setResponse((prev) => [...prev.slice(0, -1), currentResponse.join('')])
+          const message = currentResponse.join('')
+          setDialogues((prev) => [...prev.slice(0, -1), { role: "assistant", content: message }])
         }
         // breaks text indent on refresh due to streaming
-        // localStorage.setItem('response', JSON.stringify(currentResponse));
+        // localStorage.setItem('dialogues', JSON.stringify(currentResponse));
         setIsLoading(false)
     }
 
     const handleReset = () => {
-        localStorage.removeItem('response')
-        setResponse([])
+        localStorage.removeItem('dialogues')
+        setDialogues([])
     }
 
     const handleSignout = async () =>  {
@@ -86,13 +87,13 @@ const Chat = () => {
       }
     }
 
-    const renderMessaged = (item: any, index: number) => {
-      if (index % 2 === 0 ) {
+    const renderMessaged = (item: any) => {
+      if (item.role === "user" ) {
         return (
           <div className="chat-message">
             <div className="flex items-end justify-end">
                 <div className="flex flex-col space-y-2 text-lg max-w-xs mx-2 order-1 items-end">
-                  <div><span className="px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white">{item}</span></div>
+                  <div><span className="px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white">{item.content}</span></div>
                 </div>
                 <img src="https://images.unsplash.com/photo-1590031905470-a1a1feacbb0b?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=3&amp;w=144&amp;h=144" alt="My profile" className="w-6 h-6 rounded-full order-2"/>
             </div>
@@ -103,7 +104,7 @@ const Chat = () => {
           <div className="chat-message">
             <div className="flex items-end">
               <div className="flex flex-col space-y-2 text-lg max-w-xs mx-2 order-2 items-start">
-                  <div><span className="px-4 py-2 rounded-lg inline-block rounded-bl-none bg-gray-300 text-gray-600">{item}</span></div>
+                  <div><span className="px-4 py-2 rounded-lg inline-block rounded-bl-none bg-gray-300 text-gray-600">{item.content}</span></div>
               </div>
               <img src="https://ph-files.imgix.net/b739ac93-2899-4cc1-a893-40ea8afde77e.png" alt="My profile" className="w-6 h-6 rounded-full order-1"/>
             </div>
@@ -112,7 +113,7 @@ const Chat = () => {
       }
     };
 
-    const itemsToRender = isLoading ? response : response || null;
+    const itemsToRender = isLoading ? dialogues : dialogues || null;
 
 
 
@@ -136,7 +137,7 @@ const Chat = () => {
          </button>
          <button type="button" onClick={handleSignout} className="inline-flex items-center justify-center rounded-lg border h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6">
-               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                <line x1="21" y1="12" x2="9" y2="12"></line>
                <polyline points="16 17 21 12 16 7"></polyline>
             </svg>

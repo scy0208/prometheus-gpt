@@ -13,7 +13,7 @@ import {
   
   export interface OpenAIStreamPayload {
     model: string;
-    messages: ChatGPTMessage[];
+    messages: { role: string; content: string }[];
     temperature: number;
     top_p: number;
     frequency_penalty: number;

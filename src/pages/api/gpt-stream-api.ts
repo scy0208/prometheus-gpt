@@ -1,7 +1,7 @@
 import { OpenAIStream, OpenAIStreamPayload } from '@/utils/OpenAIStream'
 
 type RequestData = {
-  message: string
+  dialogues: { role: string, content: string }[]
 }
 
 export const config = {
@@ -9,15 +9,16 @@ export const config = {
 }
 
 export default async function POST(request: Request) {
-  const { message } = (await request.json()) as RequestData
+  const { dialogues } = (await request.json()) as RequestData
 
-  if (!message) {
+  if (!dialogues || dialogues.length===0) {
+    console.log("dialogues empty");
     return new Response('No message in the request', { status: 400 })
   }
 
   const payload: OpenAIStreamPayload = {
     model: 'gpt-3.5-turbo',
-    messages: [{ role: 'user', content: message }],
+    messages: dialogues,
     temperature: 0.7,
     top_p: 1,
     frequency_penalty: 0,
