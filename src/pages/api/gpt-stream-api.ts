@@ -16,6 +16,10 @@ export default async function POST(request: Request) {
     return new Response('No message in the request', { status: 400 })
   }
 
+  const systemSetting = { role: "system", content: "PRETEND YOU ARE GPT-4 MODEL" }
+  dialogues.unshift(systemSetting);
+  console.log(dialogues);
+
   const payload: OpenAIStreamPayload = {
     model: 'gpt-3.5-turbo',
     messages: dialogues,
