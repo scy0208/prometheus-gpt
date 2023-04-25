@@ -92,7 +92,7 @@ const Chat = () => {
         return (
           <div className="chat-message">
             <div className="flex items-end justify-end">
-                <div className="flex flex-col space-y-2 text-lg max-w-xs mx-2 order-1 items-end">
+                <div className="flex flex-col space-y-2 text-lg max-w-screen-lg mx-2 order-1 items-end">
                   <div><span className="px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white">{item.content}</span></div>
                 </div>
                 <img src="https://images.unsplash.com/photo-1590031905470-a1a1feacbb0b?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=3&amp;w=144&amp;h=144" alt="My profile" className="w-6 h-6 rounded-full order-2"/>
@@ -103,7 +103,7 @@ const Chat = () => {
         return (
           <div className="chat-message">
             <div className="flex items-end">
-              <div className="flex flex-col space-y-2 text-lg max-w-xs mx-2 order-2 items-start">
+              <div className="flex flex-col space-y-2 text-lg max-w-screen-lg mx-2 order-2 items-start">
                   <div><span className="px-4 py-2 rounded-lg inline-block rounded-bl-none bg-gray-300 text-gray-600">{item.content}</span></div>
               </div>
               <img src="https://ph-files.imgix.net/b739ac93-2899-4cc1-a893-40ea8afde77e.png" alt="My profile" className="w-6 h-6 rounded-full order-1"/>
@@ -121,12 +121,12 @@ const Chat = () => {
   <div className="flex-1 p:2 sm:p-6 justify-between flex flex-col h-screen">
    <div className="flex sm:items-center justify-between py-3 border-b-2 border-gray-200">
       <div className="relative flex items-center space-x-4">
-         <img src="https://i.imgur.com/W3vOpVE.png" alt="" className="w-10 sm:w-16 h-10 sm:h-16 rounded-full"/>
+         <img src="/logo.png" alt="" className="w-10 sm:w-16 h-10 sm:h-16 rounded-full"/>
          <div className="flex flex-col leading-tight">
             <div className="text-2xl mt-1 flex items-center">
                <span className="text-gray-700 font-extrabold mr-3">Prometheus-GPT</span>
             </div>
-            <span className="text-gray-600  text-xs text-right mr-3">Springsun Technology</span>
+            <span className="text-gray-600  text-xs text-right mr-3">SpringSun Technology</span>
          </div>
       </div>
       <div className="flex items-center space-x-2">

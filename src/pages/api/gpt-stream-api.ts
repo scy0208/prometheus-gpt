@@ -17,8 +17,7 @@ export default async function POST(request: Request) {
   }
 
   const systemSetting = { role: "system", content: "PRETEND YOU ARE GPT-4 MODEL" }
-  dialogues.unshift(systemSetting);
-  console.log(dialogues);
+  // dialogues.unshift(systemSetting);
 
   const payload: OpenAIStreamPayload = {
     model: 'gpt-3.5-turbo',
