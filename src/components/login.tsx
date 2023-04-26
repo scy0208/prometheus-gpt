@@ -14,7 +14,7 @@ export default function Login() {
     <div>
       <Head>
         <title>Prometheus-GPT</title>
-        <link rel="icon" href="/logo.ico" />
+        <link rel="icon" href="/logo.png" />
       </Head>
       <main>
         <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -29,7 +29,7 @@ export default function Login() {
               </p>
             </div>
 
-            {status === 'sign-in' ? <SignIn setStatus={setStatus} /> : null}
+            {status === 'sign-in' ? <SignIn setStatus={setStatus} setUser={setUser}/> : null}
             {status === 'register' ? <Register setStatus={setStatus} setUser={setUser} /> : null}
             {status === 'confirm' ? <Confirm setStatus={setStatus} user={user} /> : null}
           </div>

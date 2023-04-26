@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useRouter} from 'next/router'
 import { Auth } from 'aws-amplify';
 import { useForm } from "react-hook-form";
-export default function SignIn({ setStatus }) {
+export default function SignIn({ setStatus, setUser}) {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [submitError, setSubmitError] = useState('');
 
@@ -13,6 +13,13 @@ export default function SignIn({ setStatus }) {
       await Auth.signIn(email, password);
       router.reload()
     } catch (error) {
+      if (error.name === 'UserNotConfirmedException') {
+        setStatus('confirm')
+        setUser({
+          username: email,
+          password: password,
+        })
+      }
       console.log('error signing in', error);
       setSubmitError(error.message);
     }
