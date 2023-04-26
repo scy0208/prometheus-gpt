@@ -19,12 +19,18 @@ export default function Confirm({ setStatus, user }) {
   }
 
   return (
+
+
+  
     <form className="mt-8 space-y-6" onSubmit={handleSubmit(confirmSignUp)}>
+      <div className="text-black text-s">
+        <p>您的账号还未经过邮箱认证，您会收到一封包含验证码的邮件，请查看你的邮箱</p>
+      </div>
       <input type="hidden" name="remember" value="true" />
       <div className="rounded-md shadow-sm -space-y-px">
         <div>
           <label htmlFor="code" className="sr-only">Code</label>
-          <input id="code" name="code" type="number" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Enter verification code" {...register("code", { required: true })}/>
+          <input id="code" name="code" type="number" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Enterd verification code" {...register("code", { required: true })}/>
         </div>
         {submitError && <p className="text-red-500">{submitError}</p>}
       </div>
