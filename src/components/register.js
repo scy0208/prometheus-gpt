@@ -29,6 +29,19 @@ export default function Register({ setStatus, setUser }) {
     }
   }
 
+  const emailDomain = process.env.NEXT_PUBLIC_EMAIL_DOMAIN;
+
+  // If the email domain is set, use a pattern that restricts the domain
+  // Otherwise, use a general email validation pattern without domain restriction
+  const emailRegex = emailDomain
+    ? new RegExp(`^[a-zA-Z0-9._%+-]+@${emailDomain}$`)
+    : /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+  // Set the error message based on whether the email domain is set
+  const errorMessage = emailDomain
+    ? `请使用 @${emailDomain} 邮箱注册`
+    : '请输入有效的邮箱地址';
+
   return (
     <form className="mt-8 space-y-6" onSubmit={handleSubmit(signUp)}>
       <input type="hidden" name="remember" value="true" />
@@ -39,8 +52,8 @@ export default function Register({ setStatus, setUser }) {
           {...register('email', {
             required: 'Email is required',
             pattern: {
-                value: /^[a-zA-Z0-9._%+-]+@kgipr\.com$/,
-                message: '请使用 @kgipr.com 邮箱注册',
+                value: emailRegex,
+                message: errorMessage,
             },
         })}/>
           {errors.email && <p className="text-red-500">{errors.email.message}</p>}

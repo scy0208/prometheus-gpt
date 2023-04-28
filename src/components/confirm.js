@@ -19,9 +19,6 @@ export default function Confirm({ setStatus, user }) {
   }
 
   return (
-
-
-  
     <form className="mt-8 space-y-6" onSubmit={handleSubmit(confirmSignUp)}>
       <div className="text-black text-s">
         <p>您的账号还未经过邮箱认证，您会收到一封包含验证码的邮件，请查看你的邮箱</p>
