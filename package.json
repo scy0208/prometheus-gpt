@@ -9,15 +9,15 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-amplify/auth": "latest",
+    "@aws-amplify/core": "latest",
+    "@aws-amplify/storage": "latest",
+    "@aws-amplify/ui-react": "4.6.0",
     "@types/node": "18.15.11",
     "@types/react": "18.0.33",
     "@types/react-dom": "18.0.11",
     "@types/react-router-dom": "^5.3.3",
     "@vercel/analytics": "^0.1.11",
-    "@aws-amplify/ui-react": "4.6.0",
-    "@aws-amplify/core": "latest",
-    "@aws-amplify/auth": "latest",
-    "@aws-amplify/storage": "latest",
     "aws-amplify": "^5.1.2",
     "eslint": "8.37.0",
     "eslint-config-next": "13.2.4",
@@ -26,11 +26,15 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.43.9",
+    "react-markdown": "^8.0.7",
     "react-router-dom": "^6.10.0",
+    "remark-gfm": "^3.0.1",
     "swr": "^1.2.2",
+    "tabler-icons-react": "^1.56.0",
     "typescript": "5.0.3"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.9",
     "autoprefixer": "^10.4.13",
     "postcss": "^8.4.21",
     "tailwindcss": "^3.2.7"

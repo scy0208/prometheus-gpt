@@ -18,6 +18,7 @@ export default async function POST(request: Request) {
 
   const systemSetting = { role: "system", content: "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown." }
   dialogues.unshift(systemSetting);
+  console.log(dialogues);
 
   const payload: OpenAIStreamPayload = {
     model: 'gpt-3.5-turbo',

@@ -2,7 +2,9 @@
 import { useRef, useState, useEffect } from 'react'
 import { Auth } from 'aws-amplify';
 import Router from 'next/router';
-import { ChatGPTMessage } from '@/utils/OpenAIStream'
+import { Trash, Logout } from 'tabler-icons-react';
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const Chat = () => {
     const messageInput = useRef<HTMLTextAreaElement | null>(null)
@@ -23,14 +25,13 @@ const Chat = () => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         const message = messageInput.current?.value
-        let currentDialogues = JSON.parse(JSON.stringify(dialogues))
 
         if (!message || message === undefined) {
           return
         }
 
-        setDialogues((prev) => [...prev, { role: "user", content: message }])
-        currentDialogues.push({ role: "user", content: message })
+        const updateDialogies = [...dialogues, { role: "user", content: message }]
+        setDialogues(updateDialogies)
         messageInput.current!.value = ''
     
         const httpResponse = await fetch('/api/gpt-stream-api', {
@@ -39,7 +40,7 @@ const Chat = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            dialogues: currentDialogues
+            dialogues: updateDialogies
           }),
         })
     
@@ -92,10 +93,10 @@ const Chat = () => {
         return (
           <div className="chat-message">
             <div className="flex items-end justify-end">
-                <div className="flex flex-col space-y-2 text-lg max-w-screen-lg mx-2 order-1 items-end">
-                  <div><span className="px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white">{item.content}</span></div>
+                <div className="flex flex-col space-y-4 text-lg max-w-screen-lg mx-2 order-1 items-end px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white">
+                  <ReactMarkdown>{item.content}</ReactMarkdown>
                 </div>
-                <img src="https://images.unsplash.com/photo-1590031905470-a1a1feacbb0b?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=3&amp;w=144&amp;h=144" alt="My profile" className="w-6 h-6 rounded-full order-2"/>
+                <img src="https://p6.itc.cn/images01/20220324/cfb33083dbec4b888b612aff575b6adc.jpeg" alt="My profile" className="w-6 h-6 rounded-full order-2"/>
             </div>
           </div>
         )
@@ -103,8 +104,23 @@ const Chat = () => {
         return (
           <div className="chat-message">
             <div className="flex items-end">
-              <div className="flex flex-col space-y-2 text-lg max-w-screen-lg mx-2 order-2 items-start">
-                  <div><span className="px-4 py-2 rounded-lg inline-block rounded-bl-none bg-gray-300 text-gray-600">{item.content}</span></div>
+              <div className="flex flex-col space-y-4 text-lg max-w-screen-lg mx-2 order-2 items-start p-4 rounded-lg inline-block rounded-bl-none bg-gray-300">
+              <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                table({ children }) {
+                  return <table className="border-collapse border border-black dark:border-white py-1 px-3">{children}</table>;
+                },
+                th({ children }) {
+                  return <th className="border border-black dark:border-white break-words py-1 px-3 bg-gray-500 text-white">{children}</th>;
+                },
+                td({ children }) {
+                  return <td className="border border-black dark:border-white break-words py-1 px-3">{children}</td>;
+                }
+              }}
+            >
+              {item.content}
+            </ReactMarkdown>
               </div>
               <img src="https://ph-files.imgix.net/b739ac93-2899-4cc1-a893-40ea8afde77e.png" alt="My profile" className="w-6 h-6 rounded-full order-1"/>
             </div>
@@ -118,33 +134,18 @@ const Chat = () => {
 
 
     return (
-  <div className="flex-1 p:2 sm:p-6 justify-between flex flex-col h-screen">
-   <div className="flex sm:items-center justify-between py-3 border-b-2 border-gray-200">
-      <div className="relative flex items-center space-x-4">
-         <img src="/logo.png" alt="" className="w-10 sm:w-16 h-10 sm:h-16 rounded-full"/>
-         <div className="flex flex-col leading-tight">
-            <div className="text-2xl mt-1 flex items-center">
-               <span className="text-gray-700 font-extrabold mr-3">Prometheus-GPT</span>
-            </div>
-            <span className="text-gray-600  text-xs text-right mr-3">SpringSun Technology</span>
-         </div>
-      </div>
-      <div className="flex items-center space-x-2">
-         <button type="button" onClick={handleReset} className="inline-flex items-center justify-center rounded-lg border h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-archive-fill" viewBox="0 0 16 16"> 
-            <path d="M12.643 15C13.979 15 15 13.845 15 12.5V5H1v7.5C1 13.845 2.021 15 3.357 15h9.286zM5.5 7h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1zM.8 1a.8.8 0 0 0-.8.8V3a.8.8 0 0 0 .8.8h14.4A.8.8 0 0 0 16 3V1.8a.8.8 0 0 0-.8-.8H.8z"/> 
-            </svg>
+  <div className="flex-1 p:2 sm:p-6 justify-between flex flex-col h-screen bg-gray-100">
+   <div className="flex justify-end border-b-2 pb-2">
+      <div className="flex space-x-2">
+         <button type="button" onClick={handleReset} className="inline-flex items-center justify-center rounded-lg border h-10 w-10 hover:bg-gray-300">
+         <Trash size={30} strokeWidth={2} color={'#6b7280'}/>
          </button>
-         <button type="button" onClick={handleSignout} className="inline-flex items-center justify-center rounded-lg border h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6">
-               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-               <line x1="21" y1="12" x2="9" y2="12"></line>
-               <polyline points="16 17 21 12 16 7"></polyline>
-            </svg>
+         <button type="button" onClick={handleSignout} className="inline-flex items-center justify-center rounded-lg border h-10 w-10 hover:bg-gray-300">
+         <Logout size={30} strokeWidth={2} color={'#6b7280'}/>
          </button>
       </div>
    </div>
-   <div id="messages" className="flex flex-col space-y-4 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch">
+   <div id="messages" className="flex flex-col space-y-4 p-3 overflow-y-auto">
       {itemsToRender && itemsToRender.map(renderMessaged)}
    </div>
    <div className="border-t-2 border-gray-200 px-4 pt-4 mb-2 sm:mb-0">
@@ -163,9 +164,7 @@ const Chat = () => {
              type="submit" disabled={isLoading}
              className="inline-flex items-center justify-center rounded-lg px-4 py-3 transition duration-500 ease-in-out text-white bg-blue-500 hover:bg-blue-400 focus:outline-none">
                <span className="font-bold">Send</span>
-               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-6 w-6 ml-2 transform rotate-90">
-                  <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
-               </svg>
+               
             </button>
          </div>
       </div>
