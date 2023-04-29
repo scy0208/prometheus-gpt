@@ -16,8 +16,8 @@ export default async function POST(request: Request) {
     return new Response('No message in the request', { status: 400 })
   }
 
-  const systemSetting = { role: "system", content: "PRETEND YOU ARE GPT-4 MODEL" }
-  // dialogues.unshift(systemSetting);
+  const systemSetting = { role: "system", content: "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown." }
+  dialogues.unshift(systemSetting);
 
   const payload: OpenAIStreamPayload = {
     model: 'gpt-3.5-turbo',
