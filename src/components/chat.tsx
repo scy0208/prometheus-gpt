@@ -5,6 +5,9 @@ import Router from 'next/router';
 import { Trash, Logout } from 'tabler-icons-react';
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeRaw from 'rehype-raw';
+import rehypeMathjax from 'rehype-mathjax';
+import remarkMath from 'remark-math';
 
 const Chat = () => {
     const messageInput = useRef<HTMLTextAreaElement | null>(null)
@@ -106,7 +109,8 @@ const Chat = () => {
             <div className="flex items-end">
               <div className="flex flex-col space-y-4 text-lg max-w-screen-lg mx-2 order-2 items-start p-4 rounded-lg inline-block rounded-bl-none bg-gray-300">
               <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
+              remarkPlugins={[remarkGfm, remarkMath]}
+              rehypePlugins={[rehypeRaw, rehypeMathjax]}
               components={{
                 table({ children }) {
                   return <table className="border-collapse border border-black dark:border-white py-1 px-3">{children}</table>;

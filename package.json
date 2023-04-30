@@ -28,7 +28,10 @@
     "react-hook-form": "^7.43.9",
     "react-markdown": "^8.0.7",
     "react-router-dom": "^6.10.0",
+    "rehype-mathjax": "^4.0.2",
+    "rehype-raw": "^6.1.1",
     "remark-gfm": "^3.0.1",
+    "remark-math": "^5.1.1",
     "swr": "^1.2.2",
     "tabler-icons-react": "^1.56.0",
     "typescript": "5.0.3"
