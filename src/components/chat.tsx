@@ -1,5 +1,5 @@
 'use client'
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, FC } from 'react'
 import { Auth } from 'aws-amplify';
 import Router from 'next/router';
 import { Trash, Logout } from 'tabler-icons-react';
@@ -8,10 +8,26 @@ import remarkGfm from "remark-gfm";
 import rehypeRaw from 'rehype-raw';
 import rehypeMathjax from 'rehype-mathjax';
 import remarkMath from 'remark-math';
+import {v4 as uuidv4} from "uuid";
 
-const Chat = () => {
+import { Conversation, Message } from "@/types";
+
+interface Props {
+  conversations: Conversation[];
+  selectedConversation: Conversation | undefined;
+  setConversations: (conversations: Conversation[]) => void;
+  setSelectedConversation: (selectedConversation: Conversation | undefined) => void;
+}
+
+
+const Chat : FC<Props> = ({
+  conversations,
+  selectedConversation,
+  setConversations,
+  setSelectedConversation
+}) => {
+
     const messageInput = useRef<HTMLTextAreaElement | null>(null)
-    const [dialogues, setDialogues] = useState<Array<{ role: string; content: string }>>([])
     const [isLoading, setIsLoading] = useState<boolean>(false)
 
     const handleEnter = (
@@ -26,15 +42,26 @@ const Chat = () => {
     }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+
+        if (!selectedConversation) {
+          return
+        }
+
         e.preventDefault()
         const message = messageInput.current?.value
 
         if (!message || message === undefined) {
           return
         }
+        // selectedConversation is the current dialogue
 
-        const updateDialogies = [...dialogues, { role: "user", content: message }]
-        setDialogues(updateDialogies)
+        setIsLoading(true)
+
+        let updatedConversation: Conversation = {
+          ...selectedConversation,
+          messages: [...selectedConversation.messages, { role: "user", content: message }]
+        };
+        setSelectedConversation(updatedConversation)
         messageInput.current!.value = ''
     
         const httpResponse = await fetch('/api/gpt-stream-api', {
@@ -43,7 +70,7 @@ const Chat = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            dialogues: updateDialogies
+            dialogues: updatedConversation.messages
           }),
         })
     
@@ -62,7 +89,11 @@ const Chat = () => {
         const decoder = new TextDecoder()
         let done = false
     
-        setDialogues((prev) => [...prev, { role: "user", content: message }])    
+        updatedConversation = {
+          ...updatedConversation,
+          messages: [...updatedConversation.messages, {role: "assistant", content: ""}]
+        }
+        setSelectedConversation(updatedConversation)
         let currentResponse: string[] = []
         while (!done) {
           const { value, done: doneReading } = await reader.read()
@@ -70,16 +101,62 @@ const Chat = () => {
           const chunkValue = decoder.decode(value)
           currentResponse = [...currentResponse, chunkValue]
           const message = currentResponse.join('')
-          setDialogues((prev) => [...prev.slice(0, -1), { role: "assistant", content: message }])
+          updatedConversation = {
+            ...updatedConversation,
+            messages: [...updatedConversation.messages.slice(0, -1), { role: "assistant", content: message }]
+          }
+          setSelectedConversation(updatedConversation)
         }
         // breaks text indent on refresh due to streaming
         // localStorage.setItem('dialogues', JSON.stringify(currentResponse));
         setIsLoading(false)
+        localStorage.setItem("selectedConversation", JSON.stringify(updatedConversation));
+
+        const updatedConversations: Conversation[] = conversations.map((conversation) => {
+          if (conversation.id === selectedConversation.id) {
+            return updatedConversation;
+          }
+  
+          return conversation;
+        });
+  
+        if (updatedConversations.length === 0) {
+          updatedConversations.push(updatedConversation);
+        }
+  
+        setConversations(updatedConversations);
+  
+        localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
+
+
+         
     }
 
     const handleReset = () => {
-        localStorage.removeItem('dialogues')
-        setDialogues([])
+      if (!selectedConversation) {
+        return
+      }
+      const updatedConversations: Conversation[] = conversations.map((conversation) => {
+        if (conversation.id === selectedConversation.id) {
+          return {
+            ...conversation,
+            messages: []
+          };
+        }
+        return conversation;
+      });
+
+      if (updatedConversations.length === 0) {
+        updatedConversations.push({
+          id: uuidv4(),
+          name: "",
+          messages: []
+        });
+      }
+        localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
+        localStorage.removeItem("selectedConversation")
+        setConversations(updatedConversations);
+        setSelectedConversation(undefined);
     }
 
     const handleSignout = async () =>  {
@@ -91,7 +168,7 @@ const Chat = () => {
       }
     }
 
-    const renderMessaged = (item: any) => {
+    const renderMessaged = (item: Message) => {
       if (item.role === "user" ) {
         return (
           <div className="chat-message">
@@ -133,7 +210,7 @@ const Chat = () => {
       }
     };
 
-    const itemsToRender = isLoading ? dialogues : dialogues || null;
+    const itemsToRender = isLoading ? selectedConversation?.messages : selectedConversation?.messages || null;
 
 
 

@@ -3,11 +3,11 @@ export type Role = "assistant" | "user";
 export interface Message {
     role: Role;
     content: string;
-  }
+}
 
 
 export interface Conversation {
-    id: number;
+    id: string;
     name: string;
     messages: Message[];
-  }
+ }

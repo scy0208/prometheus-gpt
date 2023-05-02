@@ -1,9 +1,8 @@
 import {  useState, useEffect } from 'react'
 import { Inter } from 'next/font/google'
-import Chat from '@/components/chat'
+import { Main } from '@/components/Main'
 import Login from '@/components/login'
 import { Auth } from 'aws-amplify'
-import { Sidebar } from '@/components/Sidebar'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -38,10 +37,7 @@ export default function Home() {
   if (user) {
     return (
       <main className={inter.className}>
-        <div className='flex'>
-          <Sidebar/>
-          <Chat />
-        </div>
+        <Main/>
       </main>
     );
   }
