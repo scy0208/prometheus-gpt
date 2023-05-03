@@ -43,7 +43,7 @@ const handleNewConversation = () => {
         messages: []
     };
 
-    const updatedConversations = [...conversations, newConversation];
+    const updatedConversations = [newConversation, ...conversations];
     setConversations(updatedConversations);
     localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
 

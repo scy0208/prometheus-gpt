@@ -28,6 +28,7 @@ const Chat : FC<Props> = ({
 }) => {
 
     const messageInput = useRef<HTMLTextAreaElement | null>(null)
+
     const [isLoading, setIsLoading] = useState<boolean>(false)
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -42,24 +43,29 @@ const Chat : FC<Props> = ({
       scrollToBottom();
     }, [selectedConversation?.messages]);
 
+    // useEffect(() => {
+    //   if (messageInput && messageInput.current) {
+    //     messageInput.current.style.height = "inherit";
+    //     messageInput.current.style.height = `${messageInput.current?.scrollHeight}px`;
+    //   }
+    // }, [messageInput]);
+
     const handleEnter = (
         e: React.KeyboardEvent<HTMLTextAreaElement> &
           React.FormEvent<HTMLFormElement>
     ) => {
-        if (e.key === 'Enter' && isLoading === false) {
+        if (e.key === "Enter" && !e.shiftKey) {
           e.preventDefault()
-          setIsLoading(true)
           handleSubmit(e)
         }
     }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 
+        e.preventDefault()  
         if (!selectedConversation) {
           return
         }
-
-        e.preventDefault()
         const message = messageInput.current?.value
 
         if (!message || message === undefined) {
@@ -185,7 +191,7 @@ const Chat : FC<Props> = ({
         return (
           <div className="chat-message">
             <div className="flex items-end justify-end">
-                <div className="flex flex-col space-y-4 text-lg max-w-screen-lg mx-2 order-1 items-end px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white">
+                <div className="flex flex-col space-y-4 text-lg max-w-screen-lg mx-2 order-1 items-start px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white">
                   <ReactMarkdown>{item.content}</ReactMarkdown>
                 </div>
                 <img src="https://p6.itc.cn/images01/20220324/cfb33083dbec4b888b612aff575b6adc.jpeg" alt="My profile" className="w-6 h-6 rounded-full order-2"/>
@@ -248,9 +254,9 @@ const Chat : FC<Props> = ({
       >
       <div className="relative flex">
          <textarea 
+          ref={messageInput}
           name="Message" 
           placeholder="Write your message!" 
-          ref={messageInput}
           onKeyDown={handleEnter}
           className="w-full h-12 focus:outline-none focus:placeholder-gray-400 text-gray-600 placeholder-gray-600 pl-5 bg-gray-200 rounded-md py-3"/>
          <div className="absolute right-0 items-center inset-y-0 hidden sm:flex">
