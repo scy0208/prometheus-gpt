@@ -1,5 +1,5 @@
 'use client'
-import { useRef, useState, FC } from 'react'
+import { useRef, useState, FC, useEffect } from 'react'
 import { Auth } from 'aws-amplify';
 import Router from 'next/router';
 import { Trash, Logout } from 'tabler-icons-react';
@@ -29,6 +29,18 @@ const Chat : FC<Props> = ({
 
     const messageInput = useRef<HTMLTextAreaElement | null>(null)
     const [isLoading, setIsLoading] = useState<boolean>(false)
+
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    const scrollToBottom = () => {
+      console.log("scrollToBottom called")
+      messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+    };
+  
+    useEffect(() => {
+      console.log("useEffect called")
+      scrollToBottom();
+    }, [selectedConversation?.messages]);
 
     const handleEnter = (
         e: React.KeyboardEvent<HTMLTextAreaElement> &
@@ -168,7 +180,7 @@ const Chat : FC<Props> = ({
       }
     }
 
-    const renderMessaged = (item: Message) => {
+    const renderMessages = (item: Message) => {
       if (item.role === "user" ) {
         return (
           <div className="chat-message">
@@ -226,8 +238,9 @@ const Chat : FC<Props> = ({
          </button>
       </div>
    </div>
-   <div id="messages" className="flex flex-col space-y-4 p-3 overflow-y-auto">
-      {itemsToRender && itemsToRender.map(renderMessaged)}
+   <div id="messages" className="flex flex-col space-y-4 p-3 overflow-auto">
+      {itemsToRender && itemsToRender.map(renderMessages)}
+      <div ref={messagesEndRef} />
    </div>
    <div className="border-t-2 border-gray-200 px-4 pt-4 mb-2 sm:mb-0">
       <form

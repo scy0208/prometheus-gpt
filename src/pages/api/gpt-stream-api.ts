@@ -16,14 +16,16 @@ export default async function POST(request: Request) {
     return new Response('No message in the request', { status: 400 })
   }
 
+  const slicedDialogues = dialogues.slice(Math.max(dialogues.length - 7, 0))
+
   const systemSetting = { 
     role: "system", 
     content: "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown." }
-  dialogues.unshift(systemSetting);
+    slicedDialogues.unshift(systemSetting);
 
   const payload: OpenAIStreamPayload = {
     model: 'gpt-3.5-turbo',
-    messages: dialogues,
+    messages: slicedDialogues,
     temperature: 0.7,
     top_p: 1,
     frequency_penalty: 0,
