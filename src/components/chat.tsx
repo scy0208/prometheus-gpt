@@ -43,18 +43,15 @@ const Chat : FC<Props> = ({
       scrollToBottom();
     }, [selectedConversation?.messages]);
 
-    // useEffect(() => {
-    //   if (messageInput && messageInput.current) {
-    //     messageInput.current.style.height = "inherit";
-    //     messageInput.current.style.height = `${messageInput.current?.scrollHeight}px`;
-    //   }
-    // }, [messageInput]);
-
     const handleEnter = (
         e: React.KeyboardEvent<HTMLTextAreaElement> &
           React.FormEvent<HTMLFormElement>
     ) => {
         if (e.key === "Enter" && !e.shiftKey) {
+          if (isLoading===true) {
+            return
+          }
+
           e.preventDefault()
           handleSubmit(e)
         }
@@ -165,16 +162,30 @@ const Chat : FC<Props> = ({
       });
 
       if (updatedConversations.length === 0) {
-        updatedConversations.push({
+        const newConversation = {
           id: uuidv4(),
           name: "",
           messages: []
+        }
+        updatedConversations.push(newConversation);
+        localStorage.setItem("selectConversation", JSON.stringify(newConversation));
+        setSelectedConversation(newConversation);
+      } else {
+        const updatedConversations: Conversation[] = conversations.map((conversation) => {
+          if (conversation.id === selectedConversation.id) {
+            return {
+              ...conversation,
+              messages: []
+            };
+          }
+          return conversation;
         });
+        const newConversation = updatedConversations.find(c => c.id === selectedConversation.id)
+        localStorage.setItem("selectConversation", JSON.stringify(newConversation));
+        setSelectedConversation(newConversation)
       }
-        localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
-        localStorage.removeItem("selectedConversation")
-        setConversations(updatedConversations);
-        setSelectedConversation(undefined);
+      localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
+      setConversations(updatedConversations);
     }
 
     const handleSignout = async () =>  {

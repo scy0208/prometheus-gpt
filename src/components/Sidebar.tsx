@@ -17,25 +17,6 @@ export const Sidebar: FC<Props> = ({
   setSelectedConversation
 }) => {
 
-  useEffect(() => {
-    const conversationHistory = localStorage.getItem("conversationHistory");
-
-    if (conversationHistory) {
-      setConversations(JSON.parse(conversationHistory));
-    }
-
-    const selectedConversation = localStorage.getItem("selectedConversation");
-    if (selectedConversation) {
-      setSelectedConversation(JSON.parse(selectedConversation));
-    } else {
-      setSelectedConversation({
-        id: uuidv4(),
-        name: "",
-        messages: []
-      });
-    }
-  }, []);
-
 const handleNewConversation = () => {
     const newConversation: Conversation = {
         id: uuidv4(),
@@ -56,14 +37,27 @@ const handleSelectConversation = (conversation: Conversation) => {
     localStorage.setItem("selectedConversation", JSON.stringify(conversation));
 };
 
-const handleDeleteConversation = (conversation: Conversation) => {
+const handleDeleteConversation = (conversation: Conversation) => { 
   const updatedConversations = conversations.filter((c) => c.id !== conversation.id);
   setConversations(updatedConversations);
   localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
 
   if (selectedConversation && selectedConversation.id === conversation.id) {
-    setSelectedConversation(undefined);
-    localStorage.removeItem("selectedConversation");
+    if (updatedConversations.length > 0) {
+      setSelectedConversation(updatedConversations[0])
+      localStorage.setItem("selectedConversation", JSON.stringify(updatedConversations[0]));
+    } else {
+      const newSelectedConversation = {
+        id: uuidv4(),
+        name: "",
+        messages: []
+      }
+      const newConversations = [newSelectedConversation]
+      setConversations(newConversations)
+      setSelectedConversation(newSelectedConversation)
+      localStorage.setItem("conversationHistory", JSON.stringify(newConversations));
+      localStorage.setItem("selectedConversation", JSON.stringify(newSelectedConversation));
+    }
   }
 };
 
