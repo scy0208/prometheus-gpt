@@ -24,7 +24,7 @@ export default async function POST(request: Request) {
     slicedDialogues.unshift(systemSetting);
 
   const payload: OpenAIStreamPayload = {
-    model: 'gpt-3.5-turbo',
+    model: process.env.OPENAI_GPT_MODEL || "gpt-3.5-turbo",
     messages: slicedDialogues,
     temperature: 0.7,
     top_p: 1,

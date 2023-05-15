@@ -2,7 +2,7 @@
 import { useRef, useState, FC, useEffect } from 'react'
 import { Auth } from 'aws-amplify';
 import Router from 'next/router';
-import { Trash, Logout } from 'tabler-icons-react';
+import { Trash, Logout, PlayerStop } from 'tabler-icons-react';
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from 'rehype-raw';
@@ -32,6 +32,7 @@ const Chat : FC<Props> = ({
     const [isLoading, setIsLoading] = useState<boolean>(false)
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const stopConversationRef = useRef<boolean>(false);
 
     const scrollToBottom = () => {
       console.log("scrollToBottom called")
@@ -78,12 +79,14 @@ const Chat : FC<Props> = ({
         };
         setSelectedConversation(updatedConversation)
         messageInput.current!.value = ''
+        const controller = new AbortController();
     
         const httpResponse = await fetch('/api/gpt-stream-api', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
+          signal: controller.signal,
           body: JSON.stringify({
             dialogues: updatedConversation.messages
           }),
@@ -111,6 +114,12 @@ const Chat : FC<Props> = ({
         setSelectedConversation(updatedConversation)
         let currentResponse: string[] = []
         while (!done) {
+          if (stopConversationRef.current === true) {
+            controller.abort();
+            done = true;
+            break;
+          }
+
           const { value, done: doneReading } = await reader.read()
           done = doneReading
           const chunkValue = decoder.decode(value)
@@ -241,6 +250,12 @@ const Chat : FC<Props> = ({
 
     const itemsToRender = isLoading ? selectedConversation?.messages : selectedConversation?.messages || null;
 
+    const handleStopConversation = () => {
+      stopConversationRef.current = true;
+      setTimeout(() => {
+        stopConversationRef.current = false;
+      }, 1000);
+    };
 
 
     return (
@@ -258,6 +273,14 @@ const Chat : FC<Props> = ({
    <div id="messages" className="flex flex-col space-y-4 p-3 overflow-auto">
       {itemsToRender && itemsToRender.map(renderMessages)}
       <div ref={messagesEndRef} />
+      {isLoading && (
+          <button
+            className="mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
+            onClick={handleStopConversation}
+          >
+            <PlayerStop size={16} /> {('Stop Generating')}
+          </button>
+        )}
    </div>
    <div className="border-t-2 border-gray-200 px-4 pt-4 mb-2 sm:mb-0">
       <form
