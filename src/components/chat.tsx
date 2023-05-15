@@ -1,4 +1,5 @@
 'use client'
+import { CognitoUserSession } from 'amazon-cognito-identity-js'
 import { useRef, useState, FC, useEffect } from 'react'
 import { Auth } from 'aws-amplify';
 import Router from 'next/router';
@@ -13,6 +14,7 @@ import {v4 as uuidv4} from "uuid";
 import { Conversation, Message } from "@/types";
 
 interface Props {
+  user: string;
   conversations: Conversation[];
   selectedConversation: Conversation | undefined;
   setConversations: (conversations: Conversation[]) => void;
@@ -21,6 +23,7 @@ interface Props {
 
 
 const Chat : FC<Props> = ({
+  user,
   conversations,
   selectedConversation,
   setConversations,
@@ -72,6 +75,18 @@ const Chat : FC<Props> = ({
         // selectedConversation is the current dialogue
 
         setIsLoading(true)
+
+        fetch('/api/store-prompt', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            conversation:selectedConversation.id,
+            username: user,
+            message
+          }),
+        })
 
         let updatedConversation: Conversation = {
           ...selectedConversation,

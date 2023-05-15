@@ -35,9 +35,13 @@ export default function Home() {
 
   // Render the Chat component if the user is authenticated
   if (user) {
+    const { idToken } = user;
+    const { payload } = idToken;
+    const username = payload['cognito:username'];
+
     return (
       <main className={inter.className}>
-        <Main/>
+        <Main user={ username }/>
       </main>
     );
   }

@@ -1,10 +1,16 @@
 import { Sidebar } from '@/components/Sidebar'
 import Chat from '@/components/chat'
-import { useState, useEffect } from "react";
+import { useState, useEffect, FC } from "react";
 import { Conversation } from "@/types";
 import {v4 as uuidv4} from "uuid";
 
-export const Main = () => {
+interface Props {
+  user: string
+}
+
+export const Main: FC<Props> = ({
+  user
+}) => {
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [selectedConversation, setSelectedConversation] = useState<Conversation>();   
     
@@ -46,6 +52,7 @@ export const Main = () => {
             setSelectedConversation={setSelectedConversation}
           />
           <Chat
+            user={user}
             conversations={conversations}
             selectedConversation={selectedConversation}
             setConversations={setConversations}
