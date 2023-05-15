@@ -18,7 +18,7 @@ export default async function handler(
     res: NextApiResponse
   ) {
     const { message, username, conversation } = req.body;
-    const domain = username.split('@')[1];
+    const domain = process.env.NEXT_PUBLIC_EMAIL_DOMAIN;
     const currentTime = new Date();
     const Item = {
         uuid: uuid.v4(),
