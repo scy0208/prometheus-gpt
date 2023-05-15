@@ -273,7 +273,9 @@ const Chat : FC<Props> = ({
    <div id="messages" className="flex flex-col space-y-4 p-3 overflow-auto">
       {itemsToRender && itemsToRender.map(renderMessages)}
       <div ref={messagesEndRef} />
-      {isLoading && (
+   </div>
+   <div className="px-4 pt-4 mb-2 sm:mb-0">
+   {isLoading && (
           <button
             className="mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
             onClick={handleStopConversation}
@@ -281,8 +283,6 @@ const Chat : FC<Props> = ({
             <PlayerStop size={16} /> {('Stop Generating')}
           </button>
         )}
-   </div>
-   <div className="border-t-2 border-gray-200 px-4 pt-4 mb-2 sm:mb-0">
       <form
         onSubmit={handleSubmit}
       >
