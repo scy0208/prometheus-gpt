@@ -28,11 +28,17 @@ export default async function handler(
         time: currentTime.toISOString(),
         content: message
     };
-    client.send(
+    try {
+      await client.send(
         new PutItemCommand({
-            TableName: process.env.TABLE_NAME,
-            Item: marshall(Item),
+          TableName: process.env.TABLE_NAME,
+          Item: marshall(Item),
         })
-    )
-    return res.status(200)
+      );
+  
+      return res.status(200).json({ status: 'success' });
+    } catch (error) {
+      console.error('Error occurred while writing to DynamoDB:', error);
+      return res.status(500).json({ status: 'error', message: 'Internal Server Error' });
+    }
 }

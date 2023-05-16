@@ -1,5 +1,4 @@
 'use client'
-import { CognitoUserSession } from 'amazon-cognito-identity-js'
 import { useRef, useState, FC, useEffect } from 'react'
 import { Auth } from 'aws-amplify';
 import Router from 'next/router';
@@ -61,6 +60,29 @@ const Chat : FC<Props> = ({
         }
     }
 
+    const storePrompt = async(conversation: string, message: string) => {
+      try {
+        const response = await fetch('/api/store-prompt', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            conversation,
+            username: user,
+            message
+          }),
+        });
+    
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }     
+        // Now you can process the response or just check if it's ok
+      } catch (error) {
+        console.error('Error occurred while calling /api/store-prompt:', error);
+      }  
+    }
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 
         e.preventDefault()  
@@ -75,18 +97,6 @@ const Chat : FC<Props> = ({
         // selectedConversation is the current dialogue
 
         setIsLoading(true)
-
-        fetch('/api/store-prompt', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            conversation:selectedConversation.id,
-            username: user,
-            message
-          }),
-        })
 
         let updatedConversation: Conversation = {
           ...selectedConversation,
@@ -103,6 +113,9 @@ const Chat : FC<Props> = ({
           },
           signal: controller.signal,
           body: JSON.stringify({
+            conversation:selectedConversation.id,
+            username: user,
+            message,
             dialogues: updatedConversation.messages
           }),
         })
@@ -166,9 +179,8 @@ const Chat : FC<Props> = ({
         setConversations(updatedConversations);
   
         localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
-
-
-         
+        
+        storePrompt(selectedConversation.id, message)
     }
 
     const handleReset = () => {
