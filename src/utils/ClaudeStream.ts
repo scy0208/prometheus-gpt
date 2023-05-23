@@ -1,44 +1,56 @@
 import {
-    createParser,
-    ParsedEvent,
-    ReconnectInterval,
-  } from 'eventsource-parser';
-  
-  export type ChatGPTAgent = 'user' | 'system';
-  
-  export interface ChatGPTMessage {
-    role: ChatGPTAgent;
-    content: string;
-  }
-  
-  export interface OpenAIStreamPayload {
-    model: string;
-    messages: { role: string; content: string }[];
-    temperature: number;
-    top_p: number;
-    frequency_penalty: number;
-    presence_penalty: number;
-    max_tokens: number;
-    stream: boolean;
-    n: number;
-  }
-  
-  export async function OpenAIStream(payload: OpenAIStreamPayload) {
+  createParser,
+  ParsedEvent,
+  ReconnectInterval,
+} from 'eventsource-parser';
+
+const PROMPT_SUFFIX = "IMPORTANT: Please respond in Markdown format when appropriate.";
+const AI_PROMPT = "\n\nAssistant:"
+const HUMAN_PROMPT="\n\nHuman:"
+
+export function convertOpenAIMessagesToAnthropicMessages(messages: any) {
+    let message = "";
+    for (let i = 0; i < messages.length; i++) {
+        const role = messages[i].role;
+        const content = messages[i].content;
+        if (role === "system") {
+            message += `${HUMAN_PROMPT} ${content}. ${PROMPT_SUFFIX}`;
+        }
+        else if (role === "user") {
+            message += `${HUMAN_PROMPT} ${content}`;
+        } else if (role === "assistant") {
+            message += `${AI_PROMPT} ${content}`;
+        }
+
+    }
+    return message+`${AI_PROMPT}`;
+}
+
+export interface ClaudeStreamPayload {
+  prompt: string;
+  model: string;
+  max_tokens_to_sample: number;
+  stop_sequences: string[];
+  stream: boolean
+}
+
+export async function ClaudeStream(payload: ClaudeStreamPayload) {
     const encoder = new TextEncoder();
     const decoder = new TextDecoder();
   
     let counter = 0;
   
-    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    const res = await fetch('https://api.anthropic.com/v1/complete', {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY ?? ''}`,
+        'x-api-key': `${process.env.ANTHROPIC_API_KEY ?? ''}`,
       },
       method: 'POST',
       body: JSON.stringify(payload),
     });
 
-    console.log(res)
+    let text = '';
+    let oldText = '';
   
     const stream = new ReadableStream({
       async start(controller) {
@@ -53,10 +65,12 @@ import {
             }
             try {
               const json = JSON.parse(data);
-              const text = json.choices[0].delta?.content || '';
+              text = json.completion || '';
+              //const queue = encoder.encode(text.replace(oldText, ''));
               const queue = encoder.encode(text);
               controller.enqueue(queue);
               counter++;
+              oldText = text
             } catch (e) {
               // maybe parse error
               controller.error(e);
@@ -76,4 +90,7 @@ import {
   
     return stream;
   }
-  
+
+
+
+
