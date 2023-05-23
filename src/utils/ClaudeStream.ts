@@ -66,8 +66,8 @@ export async function ClaudeStream(payload: ClaudeStreamPayload) {
             try {
               const json = JSON.parse(data);
               text = json.completion || '';
-              //const queue = encoder.encode(text.replace(oldText, ''));
-              const queue = encoder.encode(text);
+              const queue = encoder.encode(text.replace(oldText, ''));
+              //const queue = encoder.encode(text);
               controller.enqueue(queue);
               counter++;
               oldText = text

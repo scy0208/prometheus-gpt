@@ -135,7 +135,7 @@ const Chat : FC<Props> = ({
           messages: [...updatedConversation.messages, {role: "assistant", content: ""}]
         }
         setSelectedConversation(updatedConversation)
-        updatedConversation = await handleClaudeResponse(controller, httpResponse, updatedConversation)
+        updatedConversation = await handleOpenAIResponse(controller, httpResponse, updatedConversation)
         
         // breaks text indent on refresh due to streaming
         // localStorage.setItem('dialogues', JSON.stringify(currentResponse));
