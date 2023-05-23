@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.4.3",
     "@aws-amplify/auth": "latest",
     "@aws-amplify/core": "latest",
     "@aws-amplify/storage": "latest",
