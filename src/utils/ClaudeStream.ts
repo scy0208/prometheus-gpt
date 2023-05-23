@@ -1,4 +1,3 @@
-import { AI_PROMPT, HUMAN_PROMPT } from "@anthropic-ai/sdk";
 import {
   createParser,
   ParsedEvent,
@@ -6,6 +5,8 @@ import {
 } from 'eventsource-parser';
 
 const PROMPT_SUFFIX = "IMPORTANT: Please respond in Markdown format when appropriate.";
+const AI_PROMPT = "\n\nAssistant:"
+const HUMAN_PROMPT="\n\nHuman:"
 
 export function convertOpenAIMessagesToAnthropicMessages(messages: any) {
     let message = "";

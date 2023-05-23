@@ -106,7 +106,7 @@ const Chat : FC<Props> = ({
         messageInput.current!.value = ''
         const controller = new AbortController();
     
-        const httpResponse = await fetch('/api/gpt-stream-api', {
+        const httpResponse = await fetch('/api/claude-stream-api', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -125,40 +125,17 @@ const Chat : FC<Props> = ({
         if (!httpResponse.ok) {
           throw new Error(httpResponse.statusText)
         }
-    
-        const data = httpResponse.body
-        if (!data) {
-          return
+
+        if (!httpResponse.body) {
+          return new Error("No body of the response")
         }
-    
-        const reader = data.getReader()
-        const decoder = new TextDecoder()
-        let done = false
     
         updatedConversation = {
           ...updatedConversation,
           messages: [...updatedConversation.messages, {role: "assistant", content: ""}]
         }
         setSelectedConversation(updatedConversation)
-        let currentResponse: string[] = []
-        while (!done) {
-          if (stopConversationRef.current === true) {
-            controller.abort();
-            done = true;
-            break;
-          }
-
-          const { value, done: doneReading } = await reader.read()
-          done = doneReading
-          const chunkValue = decoder.decode(value)
-          currentResponse = [...currentResponse, chunkValue]
-          const message = currentResponse.join('')
-          updatedConversation = {
-            ...updatedConversation,
-            messages: [...updatedConversation.messages.slice(0, -1), { role: "assistant", content: message }]
-          }
-          setSelectedConversation(updatedConversation)
-        }
+        updatedConversation = await handleClaudeResponse(controller, httpResponse, updatedConversation)
         
         // breaks text indent on refresh due to streaming
         // localStorage.setItem('dialogues', JSON.stringify(currentResponse));
@@ -187,7 +164,7 @@ const Chat : FC<Props> = ({
     const handleOpenAIResponse = async (controller: AbortController, httpResponse: Response, updatedConversation: Conversation) => {
       const data = httpResponse.body
         if (!data) {
-          return
+          return updatedConversation
         }
     
       const reader = data.getReader()
@@ -213,12 +190,13 @@ const Chat : FC<Props> = ({
         }
         setSelectedConversation(updatedConversation)
       }
+      return updatedConversation;
     }
 
     const handleClaudeResponse = async (controller: AbortController, httpResponse: Response, updatedConversation: Conversation) => {
       const data = httpResponse.body
         if (!data) {
-          return
+          return updatedConversation
         }
     
       const reader = data.getReader()
@@ -242,6 +220,7 @@ const Chat : FC<Props> = ({
           setSelectedConversation(updatedConversation)
         } 
       }
+      return updatedConversation;
     }
 
 
