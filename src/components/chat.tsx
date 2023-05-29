@@ -106,7 +106,7 @@ const Chat : FC<Props> = ({
         messageInput.current!.value = ''
         const controller = new AbortController();
     
-        const httpResponse = await fetch('/api/claude-stream-api', {
+        const httpResponse = await fetch('/api/gpt-stream-api', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
