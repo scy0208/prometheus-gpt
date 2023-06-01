@@ -1,7 +1,7 @@
 import { Plus, Message, Trash } from 'tabler-icons-react'
 import { Logo } from '../components/logo'
 import { Conversation } from "@/types";
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useState } from 'react';
 import {v4 as uuidv4} from "uuid";
 
 interface Props {
@@ -17,7 +17,23 @@ export const Sidebar: FC<Props> = ({
   setSelectedConversation
 }) => {
 
+const [limit, setLimit] = useState<boolean>(false)
+
+useEffect(() => {
+  if (process.env.NEXT_PUBLIC_TRIAL_PERIOD_LIMITATION 
+    && conversations 
+    && conversations.length >= parseInt(process.env.NEXT_PUBLIC_TRIAL_PERIOD_LIMITATION)) {
+    setLimit(true);
+  } else {
+    setLimit(false);
+  }
+}, [conversations]);
+
 const handleNewConversation = () => {
+    if (limit) {
+      return
+    }
+
     const newConversation: Conversation = {
         id: uuidv4(),
         name: "",
@@ -76,6 +92,12 @@ const handleDeleteConversation = (conversation: Conversation) => {
           New chat
         </button>
       </div>
+
+      {limit &&
+        (<div className="bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3" role="alert">
+          <p className="text-sm"> 试用期不支持保存{process.env.NEXT_PUBLIC_TRIAL_PERIOD_LIMITATION}个以上历史记录，请联系管理员 </p>
+        </div>)
+      }
 
       <div className="flex-1 mx-auto pb-2 overflow-auto w-full">
         {conversations.map((conversation, index) => (

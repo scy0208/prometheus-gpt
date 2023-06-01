@@ -32,6 +32,7 @@ const Chat : FC<Props> = ({
     const messageInput = useRef<HTMLTextAreaElement | null>(null)
 
     const [isLoading, setIsLoading] = useState<boolean>(false)
+    const [limit, setLimit] = useState<boolean>(false)
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const stopConversationRef = useRef<boolean>(false);
@@ -42,7 +43,13 @@ const Chat : FC<Props> = ({
     };
   
     useEffect(() => {
-      console.log("useEffect called")
+      if (process.env.NEXT_PUBLIC_TRIAL_PERIOD_LIMITATION 
+        && selectedConversation 
+        && selectedConversation.messages.length >= parseInt(process.env.NEXT_PUBLIC_TRIAL_PERIOD_LIMITATION)) {
+        setLimit(true);
+      } else {
+        setLimit(false);
+      }
       scrollToBottom();
     }, [selectedConversation?.messages]);
 
@@ -89,6 +96,11 @@ const Chat : FC<Props> = ({
         if (!selectedConversation) {
           return
         }
+
+        if (limit) {
+          return
+        }
+
         const message = messageInput.current?.value
 
         if (!message || message === undefined) {
@@ -351,6 +363,11 @@ const Chat : FC<Props> = ({
             <PlayerStop size={16} /> {('Stop Generating')}
           </button>
         )}
+    {limit && process.env.NEXT_PUBLIC_TRIAL_PERIOD_LIMITATION &&
+        (<div className="bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3" role="alert">
+          <p className="text-sm"> 试用期不支持{parseInt(process.env.NEXT_PUBLIC_TRIAL_PERIOD_LIMITATION)/2}轮以上长对话，请联系管理员 </p>
+        </div>)
+    }
       <form
         onSubmit={handleSubmit}
       >
