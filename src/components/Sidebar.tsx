@@ -95,7 +95,7 @@ const handleDeleteConversation = (conversation: Conversation) => {
 
       {limit &&
         (<div className="bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3" role="alert">
-          <p className="text-sm"> 试用期不支持保存{process.env.NEXT_PUBLIC_TRIAL_PERIOD_LIMITATION}个以上历史记录，请联系管理员 </p>
+          <p className="text-sm"> 试用期不支持保存{process.env.NEXT_PUBLIC_TRIAL_PERIOD_LIMITATION}个以上历史记录，请联系管理员。您可以删除多余的历史记录继续使用。 </p>
         </div>)
       }
 
