@@ -78,11 +78,11 @@ const handleDeleteConversation = (conversation: Conversation) => {
 };
 
   return (
-    <div className="flex flex-col space-y-3 p-3 bg-slate-300 w-[300px] hidden md:flex">
+    <div className="flex flex-col space-y-3 p-3 bg-rose-200 w-[300px] hidden md:flex">
       <Logo/>
       <div className="flex items-center justify-center h-[60px]">
         <button 
-          className="flex items-center w-full h-[40px] rounded-lg text-sm hover:bg-slate-400 border border-white"
+          className="flex items-center w-full h-[40px] rounded-lg text-sm hover:bg-rose-300 border border-white"
           onClick={handleNewConversation}
         >
           <Plus
@@ -103,7 +103,7 @@ const handleDeleteConversation = (conversation: Conversation) => {
         {conversations.map((conversation, index) => (
             <div
               key={index}
-              className={`flex items-center justify-start w-full h-[40px] px-2 text-sm rounded-lg hover:bg-slate-400 cursor-pointer ${selectedConversation && selectedConversation.id === conversation.id ? "bg-slate-500 text-white" : ""}`}
+              className={`flex items-center justify-start w-full h-[40px] px-2 text-sm rounded-lg hover:bg-rose-300 cursor-pointer ${selectedConversation && selectedConversation.id === conversation.id ? "bg-rose-500 text-white" : ""}`}
               onClick={() => handleSelectConversation(conversation)}
             >
               <Message

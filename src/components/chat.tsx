@@ -291,7 +291,7 @@ const Chat : FC<Props> = ({
         return (
           <div className="chat-message">
             <div className="flex items-end justify-end">
-                <div className="flex flex-col space-y-4 text-lg max-w-screen-lg mx-2 order-1 items-start px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white">
+                <div className="flex flex-col space-y-4 text-lg max-w-screen-lg mx-2 order-1 items-start px-4 py-2 rounded-lg inline-block rounded-br-none bg-pink-700 text-white">
                   <ReactMarkdown>{item.content}</ReactMarkdown>
                 </div>
                 <img src="https://p6.itc.cn/images01/20220324/cfb33083dbec4b888b612aff575b6adc.jpeg" alt="My profile" className="w-6 h-6 rounded-full order-2"/>
@@ -381,7 +381,7 @@ const Chat : FC<Props> = ({
          <div className="absolute right-0 items-center inset-y-0 hidden sm:flex">
             <button 
              type="submit" disabled={isLoading}
-             className="inline-flex items-center justify-center rounded-lg px-4 py-3 transition duration-500 ease-in-out text-white bg-blue-500 hover:bg-blue-400 focus:outline-none">
+             className="inline-flex items-center justify-center rounded-lg px-4 py-3 transition duration-500 ease-in-out text-white bg-pink-600 hover:bg-pink-500 focus:outline-none">
                <span className="font-bold">Send</span>
                
             </button>

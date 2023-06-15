@@ -13,7 +13,7 @@ export default function Login() {
   return (
     <div>
       <Head>
-        <title>Prometheus-GPT</title>
+        <title>AI-Sommelier</title>
         <link rel="icon" href="/logo.png" />
       </Head>
       <main>
