@@ -28,6 +28,7 @@ export default async function handler(
         time: currentTime.toISOString(),
         content: message
     };
+    console.log(Item)
     try {
       await client.send(
         new PutItemCommand({

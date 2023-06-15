@@ -68,6 +68,11 @@ const Chat : FC<Props> = ({
     }
 
     const storePrompt = async(conversation: string, message: string) => {
+      console.log(JSON.stringify({
+        conversation,
+        username: user,
+        message
+      }))
       try {
         const response = await fetch('/api/store-prompt', {
           method: 'PUT',
@@ -80,6 +85,8 @@ const Chat : FC<Props> = ({
             message
           }),
         });
+
+        console.log(response)
     
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

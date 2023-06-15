@@ -22,10 +22,10 @@ export default function Login() {
             <div>
               <img className="mx-auto h-70 w-auto" src="/logo.png" alt="Workflow" />
               <p className="text-center text-3xl font-extrabold text-gray-900">
-                Prometheus-GPT
+                AI-Sommelier
               </p>
               <p className="text-right text-sm text-gray-900 mr-24">
-                SpringSun Technology
+                SpringSun Technologies LLC
               </p>
             </div>
 
