@@ -16,11 +16,15 @@ export default async function POST(request: Request) {
     return new Response('No message in the request', { status: 400 })
   }
 
-  const slicedDialogues = dialogues.slice(Math.max(dialogues.length - 7, 0))
+  const slicedDialogues = dialogues //.slice(Math.max(dialogues.length - 7, 0))
 
   const systemSetting = { 
     role: "system", 
-    content: "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown." }
+    content: "You are a sommelier providing wine recommendation \
+    based on users budget and preference. Your response should be in a short, clear, \
+    plain language like explaiing to your grandma and keep the response in 200 words. Please use the Socratic method \
+    to let users answer the right questions to clarify their needs. Respond using markdown and strong the wine name you mention.\
+    " }
     slicedDialogues.unshift(systemSetting);
 
   const payload: OpenAIStreamPayload = {
