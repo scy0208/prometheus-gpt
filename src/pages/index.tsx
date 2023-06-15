@@ -49,22 +49,22 @@ export default function Home() {
   }
 
   // Render the Chat component if the user is authenticated
-  if (user) {
-    const { idToken } = user;
-    const { payload } = idToken;
-    const username = payload['cognito:username'];
+  // if (user) {
+  //   const { idToken } = user;
+  //   const { payload } = idToken;
+  //   const username = payload['cognito:username'];
 
-    return (
-      <main className={inter.className}>
-        <Main user={ username }/>
-      </main>
-    );
-  }
+  //   return (
+  //     <main className={inter.className}>
+  //       <Main user={ username }/>
+  //     </main>
+  //   );
+  // }
 
   // Render the Login component if the user is not authenticated
   return (
     <main className={inter.className}>
-      <Login />
+      <Main user='wine_consumer'/>
     </main>
   );
 }
