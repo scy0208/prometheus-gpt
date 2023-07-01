@@ -114,7 +114,7 @@ export default async function POST(req: NextApiRequest, res: NextApiResponse) {
           database: process.env.PGDATABASE,
           ssl: true
         } as DataSourceOptions,
-        verbose: true,
+        verbose: false,
       };
 
     const typeormVectorStore = await TypeORMVectorStore.fromDataSource(
@@ -123,6 +123,9 @@ export default async function POST(req: NextApiRequest, res: NextApiResponse) {
     );
 
     const handler = BaseCallbackHandler.fromMethods({
+        handleLLMStart() {
+            res.write("Thinking...")
+        },
         handleLLMNewToken(token) {
             res.write(token)
         },
@@ -177,7 +180,7 @@ export default async function POST(req: NextApiRequest, res: NextApiResponse) {
 
     const executor = await initializeAgentExecutorWithOptions(tools, model, {
         agentType: "openai-functions",
-        verbose: true,
+        verbose: false,
         memory: createMemory(dialogues),
       });
     
