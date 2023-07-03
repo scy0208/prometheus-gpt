@@ -129,6 +129,7 @@ const Chat : FC<Props> = ({
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'accept': 'text/event-stream'
           },
           signal: controller.signal,
           body: JSON.stringify({

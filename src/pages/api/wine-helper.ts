@@ -1,8 +1,9 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
+import type { NextFetchEvent } from 'next/server'
 import { ChatOpenAI } from "langchain/chat_models/openai";
 import { RetrievalQAChain, loadQAStuffChain } from "langchain/chains";
-import { TypeORMVectorStore } from "langchain/vectorstores/typeorm";
-import { DataSourceOptions } from "typeorm";
+import { SupabaseVectorStore } from "langchain/vectorstores/supabase";
+import { RequestCookies } from "@edge-runtime/cookies";
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
 import { HumanChatMessage, SystemChatMessage, AIChatMessage, BaseChatMessage} from "langchain/schema";
 import { Message } from '@/types';
@@ -12,30 +13,27 @@ import { initializeAgentExecutorWithOptions } from "langchain/agents";
 import { BaseCallbackHandler } from "langchain/callbacks";
 import { OpenAI } from "langchain/llms/openai";
 import { DynamicTool } from "langchain/tools";
-import { Pool } from 'pg';
 
-const pool = new Pool({
-    user: process.env.PGUSER,
-    host: process.env.PGHOST,
-    database: process.env.PGDATABASE,
-    password: process.env.PGPASSWORD,
-    port: 5432, // or your PostgreSQL port number
-    ssl: true
-  });
+type RequestData = {
+    message: string;
+    dialogues: Message[]
+  }
+
+export const runtime = 'edge';
 
   
 const systemChatMessage: SystemChatMessage = new SystemChatMessage(
     `You have two identities: a master sommelier and a digit agent of Alpha Omega Winery. Based on user's instruction, 
     please decide your identy and corresponse responses, your response should be in a short, clear, and plain language like explaining to your grandma,
-    and keep the response in 100 words.
+    and keep your every response in 80 words.
 
-    If You are a master sommelier, please use inventory list to provide wine recommendations based on users' preference.
-    You should awalys use tool to get the inventory list before any recommendation to make sure what you recommend is in the inventory.
-    Please let users answer the right questions to clarify their needs as much as possible. Respond using markdown and strong the wine name you mention. 
-    After you have enough information, please first recommend ONE specific wine each time and give your reason. 
-    Then, use tool to search latest purchase info of that specific wine you just recommend, ALWAYS search and NEVER GUESS them. 
-    Finally create a table to list the results from the tool, listing the thumbnail_image, name, price, link.
-
+    If You are a master sommelier, please specify user's preference and use inventory list to provide wine recommendations in Napa. Here are the steps you need to do:
+    Firstly, if you don't have enough information please ask simple and plain questions to clarify their needs as much as possible, you don't need region information.
+    Secondly, once you believe you have enough user preference infomation, awalys use tool to get the inventory list before any recommendation to make sure what you recommend is in the inventory.
+    Thirdly, recommend one wine each time, and give clear and short reasons and tasting notes in bullet ponits
+    Finally, use tool to search latest purchase info of that specific wine you just recommend and create a table to list the results from the tool, listing the thumbnail_image, name, price, link.
+    Respond using markdown and strong the wine name you mention. 
+    
     If You are a digit agent of Alpha Omega Winery please search the winery source knowdge before answer the question, don't try to make up an answer
   `)
 
@@ -50,19 +48,24 @@ export function mapDialogue(dialogue: Message):BaseChatMessage {
     }
 }
 
+export function creaetClient() {
+    const cookies = new RequestCookies(new Headers()) as any;
+    return createRouteHandlerClient<any>(
+        { cookies: () => cookies },
+        {
+            supabaseKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+            supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL
+        }  
+    )
+}
+
 export async function search_wine_purchase_info(wineName: string) {
     try {
-  
-      const client = await pool.connect();
-  
-      const query = 'SELECT url, price, description, image_link FROM wine_product WHERE wine_name = $1';
-      const values = [wineName];
-      const result = await client.query(query, values);
-  
-      const wine = result.rows[0];
-      client.release();
-  
-      return JSON.stringify([wine]);
+        const supabase = creaetClient()
+        const wines = await supabase.from('wine_product')
+            .select(`url, price, description, image_link`)
+            .eq('wine_name', wineName)
+        return JSON.stringify(wines.data);
     } catch (error) {
       // Handle errors that occurred during the API request
       console.error("An error occurred while fetching the purchase link:", error);
@@ -70,17 +73,12 @@ export async function search_wine_purchase_info(wineName: string) {
     }
   }
 
-  export async function get_inventory_list() {
+  export async function get_inventory_wine_price_list() {
     try {
-      const client = await pool.connect();
-  
-      const query = 'SELECT wine_name FROM wine_product';
-      const result = await client.query(query);
-  
-      const wineNames = result.rows.map(product => product.wine_name);
-      client.release();
-  
-      return JSON.stringify(wineNames);
+        const supabase = creaetClient()
+        const wines = await supabase.from('wine_product')
+            .select(`wine_name, price`)
+      return JSON.stringify(wines.data);
     } catch (error) {
       // Handle errors that occurred during the API request
       console.error("An error occurred while fetching the purchase link:", error);
@@ -101,54 +99,60 @@ export function createMemory(dialogues: Message[]):BufferMemory {
     })
 }
 
-export default async function POST(req: NextApiRequest, res: NextApiResponse) {
-    const { message, dialogues } = req.body
+export default async function POST(req: Request, event: NextFetchEvent) {
+    const { message, dialogues } = (await req.json()) as RequestData
+    console.log("Log request")
+    console.log(message)
+    console.log(dialogues)
 
-    const args = {
-        postgresConnectionOptions: {
-          type: "postgres",
-          host: process.env.PGHOST,
-          port: 5432,
-          username: process.env.PGUSER,
-          password: process.env.PGPASSWORD,
-          database: process.env.PGDATABASE,
-          ssl: true
-        } as DataSourceOptions,
-        verbose: false,
-      };
+    const encoder = new TextEncoder();
+    const stream = new TransformStream();
+    const writer = stream.writable.getWriter();
 
-    const typeormVectorStore = await TypeORMVectorStore.fromDataSource(
-        new OpenAIEmbeddings(),
-        args
-    );
-
+    const supabase = creaetClient()
     const handler = BaseCallbackHandler.fromMethods({
-        handleLLMStart() {
-            res.write("Thinking...")
-        },
-        handleLLMNewToken(token) {
-            res.write(token)
-        },
-        handleLLMEnd() {
-            res.write("\n\n")
-        },
+        // handleLLMStart() {
+        //     res.write("Thinking...")
+        // },
+        handleLLMNewToken: async (token: string) => {
+            await writer.ready;
+            await writer.write(encoder.encode(token));
+          },
+        handleAgentEnd: async () => {
+            await writer.ready;
+            await writer.close();
+          },
+        handleLLMError: async (e: Error) => {
+            await writer.ready;
+            await writer.abort(e);
+          },
       });
 
     const model = new ChatOpenAI({
+        openAIApiKey: process.env.OPENAI_API_KEY,
         streaming: true,
         modelName: "gpt-4-0613",
         temperature: 0,
-        //callbacks: [handler]
       });
 
     const QAmodel = new OpenAI({
-        modelName: "gpt-4-0613",
+        openAIApiKey: process.env.OPENAI_API_KEY,
+        modelName: "gpt-3.5-turbo-0613",
         temperature: 0,
     });
 
+    const supabaseVectorStore = await SupabaseVectorStore.fromExistingIndex(
+        new OpenAIEmbeddings(),
+        {
+            client: supabase,
+            tableName: "documents",
+            queryName: "match_documents_js"
+        }
+    )
+
     const chain = new RetrievalQAChain({
         combineDocumentsChain: loadQAStuffChain(QAmodel),
-        retriever: typeormVectorStore.asRetriever(),
+        retriever: supabaseVectorStore.asRetriever(),
     })
 
     const qaTool = new ChainTool({
@@ -169,25 +173,28 @@ export default async function POST(req: NextApiRequest, res: NextApiResponse) {
               },
           }),
           new DynamicTool({
-            name: "get_inventory_list",
+            name: "get_inventory_wine_price_list",
             description:
               "You can use this tool to get inventory list",
               func: async () => {
-                return await get_inventory_list();
+                return await get_inventory_wine_price_list();
               },
           })
     ];
 
     const executor = await initializeAgentExecutorWithOptions(tools, model, {
         agentType: "openai-functions",
-        verbose: false,
+        verbose: true,
         memory: createMemory(dialogues),
       });
     
-    const result = await executor.call({
+    executor.call({
             input: message, 
          },
          [handler]
     );
-    res.end()
+
+    return new Response(stream.readable, {
+        headers: { 'Content-Type': 'text/event-stream' },
+    });
 }
