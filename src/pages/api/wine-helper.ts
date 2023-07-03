@@ -198,3 +198,4 @@ export default async function POST(req: Request, event: NextFetchEvent) {
         headers: { 'Content-Type': 'text/event-stream' },
     });
 }
+
