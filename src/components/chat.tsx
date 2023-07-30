@@ -67,7 +67,7 @@ const Chat : FC<Props> = ({
         }
     }
 
-    const storePrompt = async(conversation: string, message: string) => {
+    const storePrompt = async(conversation: string, role: string, message: string) => {
       try {
         const response = await fetch('/api/store-prompt', {
           method: 'PUT',
@@ -76,7 +76,7 @@ const Chat : FC<Props> = ({
           },
           body: JSON.stringify({
             conversation,
-            username: user,
+            username: role,
             message
           }),
         });
@@ -170,7 +170,8 @@ const Chat : FC<Props> = ({
   
         localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
         
-        storePrompt(selectedConversation.id, message)
+        storePrompt(selectedConversation.id, user, message)
+        storePrompt(selectedConversation.id, "assistant", updatedConversation.messages[updatedConversation.messages.length - 1].content)
     }
 
     const handleOpenAIResponse = async (controller: AbortController, httpResponse: Response, updatedConversation: Conversation) => {

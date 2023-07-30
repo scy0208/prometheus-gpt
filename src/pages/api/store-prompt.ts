@@ -20,8 +20,9 @@ export default async function handler(
     const { message, username, conversation } = req.body;
     const domain = process.env.NEXT_PUBLIC_EMAIL_DOMAIN;
     const currentTime = new Date();
+    const uuId = uuid.v4()
     const Item = {
-        uuid: uuid.v4(),
+        uuid: uuId,
         conversation,
         username,
         domain,
@@ -36,7 +37,7 @@ export default async function handler(
         })
       );
   
-      return res.status(200).json({ status: 'success' });
+      return res.status(200).json({ uuid: uuId });
     } catch (error) {
       console.error('Error occurred while writing to DynamoDB:', error);
       return res.status(500).json({ status: 'error', message: 'Internal Server Error' });
