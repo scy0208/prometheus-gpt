@@ -5,9 +5,12 @@ export interface Message {
     content: string;
 }
 
+export interface MessageWithId extends Message {
+    id: string
+}
 
 export interface Conversation {
     id: string;
     name: string;
-    messages: Message[];
+    messages: MessageWithId[];
  }

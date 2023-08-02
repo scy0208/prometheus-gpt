@@ -1,4 +1,5 @@
 import { OpenAIStream, OpenAIStreamPayload } from '@/utils/OpenAIStream'
+import {v4 as uuidv4} from "uuid"
 
 type RequestData = {
   dialogues: { role: string, content: string }[]
@@ -11,6 +12,8 @@ export const config = {
 export default async function POST(request: Request) {
   const { dialogues } = (await request.json()) as RequestData
 
+  console.log(dialogues)
+
   if (!dialogues || dialogues.length===0) {
     console.log("dialogues empty");
     return new Response('No message in the request', { status: 400 })
@@ -20,7 +23,8 @@ export default async function POST(request: Request) {
 
   const systemSetting = { 
     role: "system", 
-    content: "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown." }
+    content: "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown." 
+  }
     slicedDialogues.unshift(systemSetting);
 
   const payload: OpenAIStreamPayload = {
