@@ -69,18 +69,20 @@ const Chat: FC<Props> = ({
     }
   }
 
-  const storeMessage = async (conversation: string, messageId: string, user: string, content: string) => {
+  const storeMessage = async (conversation: string, id: string, user: string, content: string) => {
     try {
-      const response = await fetch('/api/store-prompt', {
+      const response = await fetch('https://llm-feedback-monitor.vercel.app/api/v0/store-content', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          conversation,
-          uuid: messageId,
-          username: user,
-          message: content
+          content,
+          id,
+          "created_by": user,
+          "group_id": conversation,
+          "project_id": "proj_657a6e9b",
+          "config_id": "4b3c7c25-a9cc-4ad2-9019-f765fc2af3ff"
         }),
       });
 
@@ -175,25 +177,27 @@ const Chat: FC<Props> = ({
     localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
 
     storeMessage(selectedConversation.id, userMessageId, user, message)
+    const aiMessageId = uuidv4()
     const aiResponse = updatedConversation.messages[updatedConversation.messages.length - 1]
 
-    storeMessage(selectedConversation.id, userMessageId, aiResponse.role, aiResponse.content)
+    storeMessage(selectedConversation.id, aiMessageId, aiResponse.role, aiResponse.content)
   }
 
   const handleFeedback = async (groupId: any, messageId: any, key: any, score: any) => {
     try {
-      const response = await fetch('/api/create-feedback', {
+      const response = await fetch('https://llm-feedback-monitor.vercel.app/api/v0/create-feedback', {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          groupId,
-          messageId,
+          project_id: "proj_657a6e9b",
+          config_id: "4b3c7c25-a9cc-4ad2-9019-f765fc2af3ff",
+          content_id: messageId,
+          group_id: groupId,
           user,
           key,
-          score,
-          comment: ""
+          score
         }),
       });
 
