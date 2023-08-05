@@ -150,7 +150,7 @@ const Chat: FC<Props> = ({
 
     updatedConversation = {
       ...updatedConversation,
-      messages: [...updatedConversation.messages, { id: userMessageId, role: "assistant", content: "" }]
+      messages: [...updatedConversation.messages, { id: "", role: "assistant", content: "" }]
     }
     setSelectedConversation(updatedConversation)
     updatedConversation = await handleOpenAIResponse(controller, httpResponse, updatedConversation)
@@ -177,10 +177,9 @@ const Chat: FC<Props> = ({
     localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
 
     storeMessage(selectedConversation.id, userMessageId, user, message)
-    const aiMessageId = uuidv4()
     const aiResponse = updatedConversation.messages[updatedConversation.messages.length - 1]
 
-    storeMessage(selectedConversation.id, aiMessageId, aiResponse.role, aiResponse.content)
+    storeMessage(selectedConversation.id, aiResponse.id, aiResponse.role, aiResponse.content)
   }
 
   const handleFeedback = async (groupId: any, messageId: any, key: any, score: any) => {
@@ -221,7 +220,7 @@ const Chat: FC<Props> = ({
     let done = false
 
     let currentResponse: string[] = []
-    const uuId = updatedConversation.messages[updatedConversation.messages.length - 1].id
+    const aiMessageId = uuidv4()
     while (!done) {
       if (stopConversationRef.current === true) {
         controller.abort();
@@ -236,7 +235,7 @@ const Chat: FC<Props> = ({
       const message = currentResponse.join('')
       updatedConversation = {
         ...updatedConversation,
-        messages: [...updatedConversation.messages.slice(0, -1), { id: uuId, role: "assistant", content: message }]
+        messages: [...updatedConversation.messages.slice(0, -1), { id: aiMessageId, role: "assistant", content: message }]
       }
       setSelectedConversation(updatedConversation)
     }
