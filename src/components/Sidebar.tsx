@@ -99,7 +99,7 @@ const handleDeleteConversation = (conversation: Conversation) => {
         </div>)
       }
 
-      <div className="flex-1 mx-auto pb-2 overflow-auto w-full">
+      <div className="flex-col pb-2 overflow-y-scroll w-full">
         {conversations.map((conversation, index) => (
             <div
               key={index}

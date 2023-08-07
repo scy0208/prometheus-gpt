@@ -23,14 +23,17 @@ export default async function POST(request: Request) {
 
   const systemSetting = { 
     role: "system", 
-    content: "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown." 
+    content: "You are ChatGPT, a large language model trained by OpenAI." +  
+    "Follow the user\'s instructions carefully. Respond using markdown." + 
+    "at the end of your response highlight that please ask user to click feedback button"
   }
-    slicedDialogues.unshift(systemSetting);
+  
+  slicedDialogues.unshift(systemSetting);
 
   const payload: OpenAIStreamPayload = {
     model: process.env.OPENAI_GPT_MODEL || "gpt-3.5-turbo",
     messages: slicedDialogues,
-    temperature: 0.7,
+    temperature: 0,
     top_p: 1,
     frequency_penalty: 0,
     presence_penalty: 0,
@@ -38,6 +41,8 @@ export default async function POST(request: Request) {
     stream: true,
     n: 1,
   }
+
+  console.log(payload)
 
   const stream = await OpenAIStream(payload)
   return new Response(stream)
