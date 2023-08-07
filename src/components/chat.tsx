@@ -71,7 +71,7 @@ const Chat: FC<Props> = ({
 
   const storeMessage = async (conversation: string, id: string, user: string, content: string) => {
     try {
-      const response = await fetch('https://llm-feedback-monitor.vercel.app/api/v0/store-content', {
+      const response = await fetch('https://llm.springsun-tech.com/api/v0/store-content', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -184,7 +184,7 @@ const Chat: FC<Props> = ({
 
   const handleFeedback = async (groupId: any, messageId: any, key: any, score: any) => {
     try {
-      const response = await fetch('https://llm-feedback-monitor.vercel.app/api/v0/create-feedback', {
+      const response = await fetch('https://llm.springsun-tech.com/api/v0/create-feedback', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -373,7 +373,7 @@ const Chat: FC<Props> = ({
               <ThumbDown />
             </button>
           </div>
-        </div>
+          </div>
 
 
       )
