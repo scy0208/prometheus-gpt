@@ -82,7 +82,7 @@ const Chat: FC<Props> = ({
           "created_by": user,
           "group_id": conversation,
           "project_id": "proj_657a6e9b",
-          "config_id": "4b3c7c25-a9cc-4ad2-9019-f765fc2af3ff"
+          "config_name": "VERSION_2023-08-01"
         }),
       });
 
@@ -191,9 +191,7 @@ const Chat: FC<Props> = ({
         },
         body: JSON.stringify({
           project_id: "proj_657a6e9b",
-          config_id: "4b3c7c25-a9cc-4ad2-9019-f765fc2af3ff",
           content_id: messageId,
-          group_id: groupId,
           user,
           key,
           score
@@ -209,6 +207,10 @@ const Chat: FC<Props> = ({
     }
   }
 
+
+
+
+  
   const handleOpenAIResponse = async (controller: AbortController, httpResponse: Response, updatedConversation: Conversation) => {
     const data = httpResponse.body
     if (!data) {
