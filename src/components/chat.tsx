@@ -10,6 +10,8 @@ import rehypeMathjax from 'rehype-mathjax';
 import remarkMath from 'remark-math';
 import { v4 as uuidv4 } from "uuid";
 
+import { Client } from 'llm-feedback-client'
+
 import { Conversation, Message, MessageWithId } from "@/types";
 
 interface Props {
@@ -38,6 +40,11 @@ const Chat: FC<Props> = ({
   const stopConversationRef = useRef<boolean>(false);
 
   const configId = "";
+
+  const feedebackClient = new Client({
+    projectId: 'proj_657a6e9b',
+    apiKey: 'YOUR_API_KEY'
+  });
 
   const scrollToBottom = () => {
     console.log("scrollToBottom called")
@@ -69,30 +76,14 @@ const Chat: FC<Props> = ({
     }
   }
 
-  const storeMessage = async (conversation: string, id: string, user: string, content: string) => {
-    try {
-      const response = await fetch('https://llm.springsun-tech.com/api/v0/store-content', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          content,
-          id,
-          "created_by": user,
-          "group_id": conversation,
-          "project_id": "proj_657a6e9b",
-          "config_name": "VERSION_2023-08-01"
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      // Now you can process the response or just check if it's ok
-    } catch (error) {
-      console.error('Error occurred while calling /api/store-prompt:', error);
-    }
+  const storeMessage = async (conversation: string, id: string, user: string, content: string) => {   
+    await feedebackClient.storeContent({
+      content,
+      configName: "VERSION_2023-08-01",
+      id,
+      groupId: conversation,
+      createdBy: user,
+    })
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -183,34 +174,14 @@ const Chat: FC<Props> = ({
   }
 
   const handleFeedback = async (groupId: any, messageId: any, key: any, score: any) => {
-    try {
-      const response = await fetch('https://llm.springsun-tech.com/api/v0/create-feedback', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          project_id: "proj_657a6e9b",
-          content_id: messageId,
-          user,
-          key,
-          score
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      // Now you can process the response or just check if it's ok
-    } catch (error) {
-      console.error('Error occurred while calling /api/create-feedback', error);
-    }
+    await feedebackClient.createFeedback({
+      contentId: messageId,
+      key,
+      score,
+      user
+    })
   }
 
-
-
-
-  
   const handleOpenAIResponse = async (controller: AbortController, httpResponse: Response, updatedConversation: Conversation) => {
     const data = httpResponse.body
     if (!data) {
@@ -275,7 +246,7 @@ const Chat: FC<Props> = ({
     return updatedConversation;
   }
 
-
+  
   const handleReset = () => {
     if (!selectedConversation) {
       return
