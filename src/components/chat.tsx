@@ -42,7 +42,7 @@ const Chat: FC<Props> = ({
   const configId = "";
 
   const feedebackClient = new Client({
-    projectId: 'proj_657a6e9b',
+    projectId: 'proj_lh6MboyMgJmsTU9mXxU_W',
     apiKey: 'YOUR_API_KEY'
   });
 
