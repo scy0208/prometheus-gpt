@@ -1,5 +1,6 @@
 import { OpenAIStream, OpenAIStreamPayload } from '@/utils/OpenAIStream'
 import {v4 as uuidv4} from "uuid"
+import { Client } from 'llm-feedback-client'
 
 type RequestData = {
   dialogues: { role: string, content: string }[]
@@ -8,6 +9,11 @@ type RequestData = {
 export const config = {
     runtime: 'edge',
 }
+
+const feedbackClient = new Client({
+  projectId: 'proj_lh6MboyMgJmsTU9mXxU_W',
+  apiKey: 'YOUR_API_KEY'
+});
 
 export default async function POST(request: Request) {
   const { dialogues } = (await request.json()) as RequestData
@@ -23,17 +29,31 @@ export default async function POST(request: Request) {
 
   const systemSetting = { 
     role: "system", 
-    content: "You are ChatGPT, a large language model trained by OpenAI." +  
+    content: "You are a knowledgable assistant helping Intellectual Property Practitioners understand other domain knowledges." +  
     "Follow the user\'s instructions carefully. Respond using markdown." + 
     "at the end of your response highlight that please ask user to click feedback button"
   }
-  
+
+  const temperature = 0.7
+  const model = process.env.OPENAI_GPT_MODEL || "gpt-3.5-turbo"
+
+  const configName = "VERSION_DOMAIN_08-20"
+
+  await feedbackClient.registerConfig({
+    configName, 
+    config: {
+      model,
+      systemSetting,
+      temperature
+    } 
+  })
+
   slicedDialogues.unshift(systemSetting);
 
   const payload: OpenAIStreamPayload = {
-    model: process.env.OPENAI_GPT_MODEL || "gpt-3.5-turbo",
+    model,
     messages: slicedDialogues,
-    temperature: 0,
+    temperature,
     top_p: 1,
     frequency_penalty: 0,
     presence_penalty: 0,
