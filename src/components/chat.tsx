@@ -46,6 +46,8 @@ const Chat: FC<Props> = ({
     apiKey: 'YOUR_API_KEY'
   });
 
+  const configName = "VERSION_DOMAIN_08-20"
+
   const scrollToBottom = () => {
     console.log("scrollToBottom called")
     messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
@@ -79,7 +81,7 @@ const Chat: FC<Props> = ({
   const storeMessage = async (conversation: string, id: string, user: string, content: string) => {   
     await feedebackClient.storeContent({
       content,
-      configName: "VERSION_2023-08-01",
+      configName,
       id,
       groupId: conversation,
       createdBy: user,
@@ -246,7 +248,7 @@ const Chat: FC<Props> = ({
     return updatedConversation;
   }
 
-  
+
   const handleReset = () => {
     if (!selectedConversation) {
       return
