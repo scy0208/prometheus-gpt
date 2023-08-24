@@ -42,11 +42,11 @@ const Chat: FC<Props> = ({
   const configId = "";
 
   const feedebackClient = new Client({
-    projectId: 'proj_lh6MboyMgJmsTU9mXxU_W',
+    projectId: 'proj_657a6e9b',
     apiKey: 'YOUR_API_KEY'
   });
 
-  const configName = "VERSION_DOMAIN_08-20"
+  const configName = "VERSION_2023-08-15"
 
   const scrollToBottom = () => {
     console.log("scrollToBottom called")
@@ -377,6 +377,7 @@ const Chat: FC<Props> = ({
           </button>
         </div>
       </div>
+      
       <div id="messages" className="flex flex-col space-y-4 p-3 overflow-auto">
         {itemsToRender && itemsToRender.map(i => renderMessages(selectedConversation?.id || "", i))}
         <div ref={messagesEndRef} />

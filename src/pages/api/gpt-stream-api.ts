@@ -11,7 +11,7 @@ export const config = {
 }
 
 const feedbackClient = new Client({
-  projectId: 'proj_lh6MboyMgJmsTU9mXxU_W',
+  projectId: 'proj_657a6e9b',
   apiKey: 'YOUR_API_KEY'
 });
 
@@ -37,7 +37,7 @@ export default async function POST(request: Request) {
   const temperature = 0.7
   const model = process.env.OPENAI_GPT_MODEL || "gpt-3.5-turbo"
 
-  const configName = "VERSION_DOMAIN_08-20"
+  const configName = "VERSION_2023-08-15"
 
   await feedbackClient.registerConfig({
     configName, 
