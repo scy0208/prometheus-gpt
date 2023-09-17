@@ -10,7 +10,8 @@ import rehypeMathjax from 'rehype-mathjax';
 import remarkMath from 'remark-math';
 import { v4 as uuidv4 } from "uuid";
 
-import { Client } from 'llm-feedback-client'
+import '@radix-ui/themes/styles.css';
+import { Client, ThumbsUpDown } from 'llm-feedback-client';
 
 import { Conversation, Message, MessageWithId } from "@/types";
 
@@ -78,7 +79,7 @@ const Chat: FC<Props> = ({
     }
   }
 
-  const storeMessage = async (conversation: string, id: string, user: string, content: string) => {   
+  const storeMessage = async (conversation: string, id: string, user: string, content: string) => {
     await feedebackClient.storeContent({
       content,
       configName,
@@ -315,6 +316,7 @@ const Chat: FC<Props> = ({
       return (
         <div className="chat-message">
           <div className="flex items-end">
+            <img src="https://ph-files.imgix.net/b739ac93-2899-4cc1-a893-40ea8afde77e.png" alt="My profile" className="w-6 h-6 rounded-full order-2" />
             <div className="flex flex-col space-y-4 text-lg max-w-screen-lg mx-2 order-2 items-start p-4 rounded-lg inline-block rounded-bl-none bg-gray-300">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm, remarkMath]}
@@ -334,21 +336,11 @@ const Chat: FC<Props> = ({
                 {item.content}
               </ReactMarkdown>
             </div>
-            <img src="https://ph-files.imgix.net/b739ac93-2899-4cc1-a893-40ea8afde77e.png" alt="My profile" className="w-6 h-6 rounded-full order-1" />
+            <div className="flex order-2">
+              <ThumbsUpDown client={feedebackClient} contentId={item.id} />
+            </div>
           </div>
-          <div>
-          </div>
-          <div className="flex items-end">
-            <button type="button" onClick={() => handleFeedback(conversation, item.id, "thumb_up", 1)}
-              className="flex flex-col text-md order-1 items-start px-4 py-1 rounded-full inline-block border-2 border-purple-600 bg-white/80 hover:bg-purple-600  text-black hover:text-white text-left">
-              <ThumbUp />
-            </button>
-            <button type="button" onClick={() => handleFeedback(conversation, item.id, "thumb_down", 1)}
-              className="flex flex-col text-md order-1 items-start px-4 py-1 rounded-full inline-block border-2 border-purple-600 bg-white/80 hover:bg-purple-600 text-black hover:text-white text-left">
-              <ThumbDown />
-            </button>
-          </div>
-          </div>
+        </div>
 
 
       )
@@ -377,15 +369,15 @@ const Chat: FC<Props> = ({
           </button>
         </div>
       </div>
-      
+
       <div id="messages" className="flex flex-col space-y-4 p-3 overflow-auto">
         {itemsToRender && itemsToRender.map(i => renderMessages(selectedConversation?.id || "", i))}
         <div ref={messagesEndRef} />
       </div>
       <div className="px-4 pt-4 mb-2 sm:mb-0">
-        <div className="bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3" role="alert">
+        {/* <div className="bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3" role="alert">
           <p className="text-sm"> 欢迎对AI的回复进行评价反馈，这将帮助我们调制模型提供更有帮助的回复 </p>
-        </div>
+        </div> */}
         {isLoading && (
           <button
             className="mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#343541] dark:text-white md:mb-0 md:mt-2"
