@@ -112,14 +112,15 @@ export default async function POST(request: Request) {
     return new Response('No message in the request', { status: 400 })
   }
 
-  const systemSetting = [{ 
+  const systemSetting = { 
     role: "system", 
     content: format_system_prompt(topics_with_description, "")
-  },
-  {
-    role: "user",
-    content: reformat_email(message)
-  }]
+  }
+
+  const messages = [
+    systemSetting,
+    { role: "user", content: reformat_email(message) },
+  ]
 
 
   const temperature = 0
@@ -138,7 +139,7 @@ export default async function POST(request: Request) {
 
   const payload: OpenAIStreamPayload = {
     model,
-    messages: systemSetting,
+    messages,
     temperature,
     top_p: 1,
     frequency_penalty: 0,
