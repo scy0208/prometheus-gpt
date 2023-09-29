@@ -112,20 +112,18 @@ export default async function POST(request: Request) {
     return new Response('No message in the request', { status: 400 })
   }
 
-  const slicedDialogues = dialogues.slice(Math.max(dialogues.length - 7, 0))
-
   const systemSetting = [{ 
     role: "system", 
     content: format_system_prompt(topics_with_description, "")
   },
   {
     role: "user",
-    content: message
+    content: reformat_email(message)
   }]
 
 
   const temperature = 0
-  const model = process.env.OPENAI_GPT_MODEL || "gpt-4-0613"
+  const model = "gpt-4-0613"
 
   const configName = "Email_Classification_20230928"
 
