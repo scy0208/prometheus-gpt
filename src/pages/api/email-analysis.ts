@@ -122,7 +122,7 @@ export default async function POST(request: Request) {
       const dialogues = requestData.dialogues;
   } catch (error) {
       console.error("Failed to parse JSON:", error);
-      console.log("Raw request body:", rawBody);  // Log the raw request body to see what it contains.
+      console.error("Raw request body:", rawBody);  // Log the raw request body to see what it contains.
       return new Response("{}", { status: 400, headers: { 'Content-Type': 'application/json' } });
   }
 
