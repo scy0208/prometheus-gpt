@@ -114,13 +114,16 @@ export default async function POST(request: Request) {
 
   let message: string;  // If you know the type, specify it here. If not, you can use 'any'.
 
+  let rawBody = '';
   try {
-      const requestData = (await request.json()) as RequestData;
+      rawBody = await request.text();  // Get the raw request body as a string.
+      const requestData = JSON.parse(rawBody) as RequestData;
       message = requestData.message;
       const dialogues = requestData.dialogues;
   } catch (error) {
       console.error("Failed to parse JSON:", error);
-      return new Response("error", { status: 400, headers: { 'Content-Type': 'application/json' } });
+      console.log("Raw request body:", rawBody);  // Log the raw request body to see what it contains.
+      return new Response("{}", { status: 400, headers: { 'Content-Type': 'application/json' } });
   }
 
   console.log(message);
