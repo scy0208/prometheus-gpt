@@ -103,9 +103,28 @@ function reformat_email(email_content: string): string {
 }
 
 export default async function POST(request: Request) {
-  const { dialogues, message } = (await request.json()) as RequestData
+  // console.log(request);
+  // try {
+  //   await request.json()
+  //   // ... rest of your logic
+  // } catch (error) {
+  //     console.error("Failed to parse JSON:", error);
+  //     return new Response("error", { status: 400, headers: { 'Content-Type': 'application/json' } });
+  // }
 
-  console.log(message)
+  let message: string;  // If you know the type, specify it here. If not, you can use 'any'.
+
+  try {
+      const requestData = (await request.json()) as RequestData;
+      message = requestData.message;
+      const dialogues = requestData.dialogues;
+  } catch (error) {
+      console.error("Failed to parse JSON:", error);
+      return new Response("error", { status: 400, headers: { 'Content-Type': 'application/json' } });
+  }
+
+  console.log(message);
+
 
   if (!message) {
     console.log("message empty");
