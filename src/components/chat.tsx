@@ -43,11 +43,11 @@ const Chat: FC<Props> = ({
   const configId = "";
 
   const feedebackClient = new Client({
-    projectId: 'proj_657a6e9b',
+    projectId: 'proj_w64QXgkCled9jD2PDy1lD',
     apiKey: 'YOUR_API_KEY'
   });
 
-  const configName = "VERSION_2023-08-15"
+  const configName = "Email_Classification_20230928"
 
   const scrollToBottom = () => {
     console.log("scrollToBottom called")

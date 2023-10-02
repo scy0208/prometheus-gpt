@@ -103,12 +103,26 @@ function reformat_email(email_content: string): string {
 }
 
 export default async function POST(request: Request) {
-  const { dialogues, message } = (await request.json()) as RequestData
 
-  console.log(dialogues)
+  let message: string;  // If you know the type, specify it here. If not, you can use 'any'.
 
-  if (!dialogues || dialogues.length===0) {
-    console.log("dialogues empty");
+  let rawBody = '';
+  try {
+      rawBody = await request.text();  // Get the raw request body as a string.
+      const requestData = JSON.parse(rawBody) as RequestData;
+      message = requestData.message;
+      const dialogues = requestData.dialogues;
+  } catch (error) {
+      console.error("Failed to parse JSON:", error);
+      console.error("Raw request body:", rawBody);  // Log the raw request body to see what it contains.
+      return new Response("{}", { status: 400, headers: { 'Content-Type': 'application/json' } });
+  }
+
+  console.log(message);
+
+
+  if (!message) {
+    console.log("message empty");
     return new Response('No message in the request', { status: 400 })
   }
 
@@ -137,7 +151,7 @@ export default async function POST(request: Request) {
     } 
   })
 
-  const payload: OpenAIStreamPayload = {
+  const payload = {
     model,
     messages,
     temperature,
@@ -145,12 +159,23 @@ export default async function POST(request: Request) {
     frequency_penalty: 0,
     presence_penalty: 0,
     max_tokens: 1000,
-    stream: true,
+    stream: false,
     n: 1,
   }
 
   console.log(payload)
 
-  const stream = await OpenAIStream(payload)
-  return new Response(stream)
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer YOUR_API_KEY`,
+      },
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+
+    const responseJson = await res.json();
+    const jsonResponse = responseJson.choices[0].message.content;
+    
+    return new Response(jsonResponse, { status: 200, headers: { 'Content-Type': 'application/json' } });
 }
