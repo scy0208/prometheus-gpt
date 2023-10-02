@@ -103,14 +103,6 @@ function reformat_email(email_content: string): string {
 }
 
 export default async function POST(request: Request) {
-  // console.log(request);
-  // try {
-  //   await request.json()
-  //   // ... rest of your logic
-  // } catch (error) {
-  //     console.error("Failed to parse JSON:", error);
-  //     return new Response("error", { status: 400, headers: { 'Content-Type': 'application/json' } });
-  // }
 
   let message: string;  // If you know the type, specify it here. If not, you can use 'any'.
 
@@ -159,7 +151,7 @@ export default async function POST(request: Request) {
     } 
   })
 
-  const payload: OpenAIStreamPayload = {
+  const payload = {
     model,
     messages,
     temperature,
@@ -176,7 +168,7 @@ export default async function POST(request: Request) {
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY ?? ''}`,
+        Authorization: `Bearer YOUR_API_KEY`,
       },
       method: 'POST',
       body: JSON.stringify(payload),
