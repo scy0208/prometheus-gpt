@@ -170,10 +170,10 @@ const Chat: FC<Props> = ({
 
     localStorage.setItem("conversationHistory", JSON.stringify(updatedConversations));
 
-    storeMessage(selectedConversation.id, userMessageId, user, message)
+    // storeMessage(selectedConversation.id, userMessageId, user, message)
     const aiResponse = updatedConversation.messages[updatedConversation.messages.length - 1]
 
-    storeMessage(selectedConversation.id, aiResponse.id, aiResponse.role, aiResponse.content)
+    // storeMessage(selectedConversation.id, aiResponse.id, aiResponse.role, aiResponse.content)
   }
 
   const handleFeedback = async (groupId: any, messageId: any, key: any, score: any) => {
@@ -336,9 +336,9 @@ const Chat: FC<Props> = ({
                 {item.content}
               </ReactMarkdown>
             </div>
-            <div className="flex order-2">
+            {/* <div className="flex order-2">
               <ThumbsUpDown client={feedebackClient} contentId={item.id} />
-            </div>
+            </div> */}
           </div>
         </div>
 
