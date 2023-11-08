@@ -39,14 +39,14 @@ export default async function POST(request: Request) {
 
   const configName = "VERSION_2023-08-15"
 
-  await feedbackClient.registerConfig({
-    configName, 
-    config: {
-      model,
-      systemSetting,
-      temperature
-    } 
-  })
+  // await feedbackClient.registerConfig({
+  //   configName, 
+  //   config: {
+  //     model,
+  //     systemSetting,
+  //     temperature
+  //   } 
+  // })
 
   slicedDialogues.unshift(systemSetting);
 
