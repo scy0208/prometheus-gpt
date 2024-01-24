@@ -29,9 +29,7 @@ export default async function POST(request: Request) {
 
   const systemSetting = { 
     role: "system", 
-    content: "You are a knowledgable assistant helping Intellectual Property Practitioners understand other domain knowledges." +  
-    "Follow the user\'s instructions carefully. Respond using markdown." + 
-    "at the end of your response highlight that please ask user to click feedback button"
+    content: "You are ChatGPT, a helpful assistant, please follow user instructions and response in markdown."
   }
 
   const temperature = 0.7

@@ -11,60 +11,60 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [disabled, setDisabled] = useState(false);
 
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const session = await Auth.currentSession();
-       if (process.env.NEXT_PUBLIC_DISABLED==="true") {
-        setDisabled(true);
-       }
-        setUser(session); // Set the user session if available
-      } catch (error) {
-        // Handle the error (e.g., user is not authenticated)
-      }
-      setLoading(false); // Set loading to false after checking the session
-    };
-    checkSession();
-  }, []);
+  // useEffect(() => {
+  //   const checkSession = async () => {
+  //     try {
+  //       const session = await Auth.currentSession();
+  //      if (process.env.NEXT_PUBLIC_DISABLED==="true") {
+  //       setDisabled(true);
+  //      }
+  //       setUser(session); // Set the user session if available
+  //     } catch (error) {
+  //       // Handle the error (e.g., user is not authenticated)
+  //     }
+  //     setLoading(false); // Set loading to false after checking the session
+  //   };
+  //   checkSession();
+  // }, []);
   
-  if(disabled) {
-    return (
-      <main className={inter.className}>
-        {/* Render a loading indicator */}
-        <div className='flex text-2xl justify-center items-center'>
-          <p>试用期结束，请联系管理员</p>
-        </div>
-      </main>
-    )
-  }
+  // if(disabled) {
+  //   return (
+  //     <main className={inter.className}>
+  //       {/* Render a loading indicator */}
+  //       <div className='flex text-2xl justify-center items-center'>
+  //         <p>试用期结束，请联系管理员</p>
+  //       </div>
+  //     </main>
+  //   )
+  // }
 
-  // Loading state
-  if (loading) {
-    return (
-      <main className={inter.className}>
-        {/* Render a loading indicator */}
-        <div>Loading...</div>
-      </main>
-    );
-  }
+  // // Loading state
+  // if (loading) {
+  //   return (
+  //     <main className={inter.className}>
+  //       {/* Render a loading indicator */}
+  //       <div>Loading...</div>
+  //     </main>
+  //   );
+  // }
 
-  // Render the Chat component if the user is authenticated
-  if (user) {
-    const { idToken } = user;
-    const { payload } = idToken;
-    const username = payload['cognito:username'];
+  // // Render the Chat component if the user is authenticated
+  // if (user) {
+  //   const { idToken } = user;
+  //   const { payload } = idToken;
+  //   const username = payload['cognito:username'];
 
-    return (
-      <main className={inter.className}>
-        <Main user={ username }/>
-      </main>
-    );
-  }
+  //   return (
+  //     <main className={inter.className}>
+  //       <Main user={ username }/>
+  //     </main>
+  //   );
+  // }
 
   // Render the Login component if the user is not authenticated
   return (
     <main className={inter.className}>
-      <Login />
+      <Main user={ "gwip.prometheus-gpt.com" }/>
     </main>
   );
 }
